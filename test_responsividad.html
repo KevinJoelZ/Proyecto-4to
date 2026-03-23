@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Responsividad - DeporteFit</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos para el test de responsividad */
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+        
+        .breakpoint-indicator {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: #1976d2;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 9999;
+        }
+        
+        .test-buttons {
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 9999;
+        }
+        
+        .test-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .test-btn:hover {
+            background: #1565c0;
+        }
+        
+        @media (max-width: 479px) {
+            .test-info, .breakpoint-indicator, .test-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body style="background: linear-gradient(180deg, #f7fbff 0%, #e3f0ff 100%);">
+    <!-- Indicadores de test -->
+    <div class="test-info">
+        <strong>Test de Responsividad</strong><br>
+        Ancho: <span id="width">-</span>px<br>
+        Alto: <span id="height">-</span>px
+    </div>
+    
+    <div class="breakpoint-indicator">
+        <span id="breakpoint">Desktop</span>
+    </div>
+    
+    <div class="test-buttons">
+        <button class="test-btn" onclick="setViewport(320, 568)">Móvil S</button>
+        <button class="test-btn" onclick="setViewport(375, 667)">Móvil M</button>
+        <button class="test-btn" onclick="setViewport(414, 896)">Móvil L</button>
+        <button class="test-btn" onclick="setViewport(768, 1024)">Tablet</button>
+        <button class="test-btn" onclick="setViewport(1024, 768)">Desktop S</button>
+        <button class="test-btn" onclick="setViewport(1200, 800)">Desktop</button>
+        <button class="test-btn" onclick="setViewport(1440, 900)">Desktop L</button>
+        <button class="test-btn" onclick="resetViewport()">Reset</button>
+    </div>
+
+    <!-- Contenido de la página principal -->
+    <header style="background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%); box-shadow: 0 2px 16px rgba(25, 118, 210, 0.08); border-radius: 0 0 1.2rem 1.2rem;">
+        <nav style="display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding: 0.7rem 1.5rem 0.7rem 1.5rem; flex-wrap: wrap;">
+            <div class="logo" style="display: flex; align-items: center; gap: 0.7rem; font-size: 2rem; color: #fff; font-weight: 700; letter-spacing: 1px;">
+                <i class="fas fa-dumbbell" style="font-size: 2.2rem; color: #ffb74d;"></i>
+                <span style="font-size: 1.5rem; color: #fff; font-weight: 700; letter-spacing: 1px;">DeporteFit</span>
+            </div>
+            <ul style="display: flex; gap: 2.2rem; list-style: none; margin: 0; padding: 0; align-items: center; font-size: 1.08rem; font-weight: 500;">
+                <li><a href="index.html" class="activo" style="color: #fff; text-decoration: none; padding: 0.3em 0.8em; border-radius: 0.7em; background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%); color: #fff; font-weight: 700;">Inicio</a></li>
+                <li><a href="servicios.html" style="color: #fff; text-decoration: none; padding: 0.3em 0.8em; border-radius: 0.7em; transition: background 0.2s;">Servicios</a></li>
+                <li><a href="entrenadores.html" style="color: #fff; text-decoration: none; padding: 0.3em 0.8em; border-radius: 0.7em; transition: background 0.2s;">Entrenadores</a></li>
+                <li><a href="planes.html" style="color: #fff; text-decoration: none; padding: 0.3em 0.8em; border-radius: 0.7em; transition: background 0.2s;">Planes y Precios</a></li>
+                <li><a href="contacto.html" style="color: #fff; text-decoration: none; padding: 0.3em 0.8em; border-radius: 0.7em; transition: background 0.2s;">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Transforma tu vida con entrenamiento deportivo profesional</h1>
+                <p class="hero-subtitle">La plataforma web líder en entrenamiento personalizado para múltiples deportes. Accede a cursos certificados, entrenadores expertos y programas diseñados para alcanzar tus objetivos deportivos desde cualquier lugar del mundo.</p>
+                <div class="hero-buttons">
+                    <a href="planes.html" class="btn btn-primary">Comenzar Ahora</a>
+                    <a href="servicios.html" class="btn btn-secondary">Ver Deportes</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">10+</span>
+                        <span class="stat-label">Deportes</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">30+</span>
+                        <span class="stat-label">Entrenadores</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">200+</span>
+                        <span class="stat-label">Alumnos</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">250+</span>
+                        <span class="stat-label">Alumnos Activos</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Entrenamiento deportivo">
+            </div>
+        </section>
+
+        <!-- Deportes Disponibles -->
+        <section class="deportes">
+            <div class="container">
+                <h2>Deportes y Disciplinas</h2>
+                <p class="section-subtitle">Explora nuestra amplia gama de deportes y disciplinas con entrenamiento profesional y certificaciones reconocidas</p>
+                <div class="deportes-grid">
+                    <div class="deporte-card">
+                        <i class="fas fa-running"></i>
+                        <h3>Running & Maratón</h3>
+                        <p>Programas de entrenamiento para corredores de todos los niveles</p>
+                        <span class="certificacion">Certificación IAAF</span>
+                    </div>
+                    <div class="deporte-card">
+                        <i class="fas fa-dumbbell"></i>
+                        <h3>Fitness & Musculación</h3>
+                        <p>Entrenamiento de fuerza y acondicionamiento físico</p>
+                        <span class="certificacion">Certificación ACE</span>
+                    </div>
+                    <div class="deporte-card">
+                        <i class="fas fa-swimming-pool"></i>
+                        <h3>Natación</h3>
+                        <p>Técnicas avanzadas y entrenamiento de resistencia</p>
+                        <span class="certificacion">Certificación FINA</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Servicios -->
+        <section class="servicios">
+            <div class="container">
+                <h2>Nuestros Servicios</h2>
+                <p class="section-subtitle">Soluciones integrales para tu desarrollo deportivo, físico y mental</p>
+                <div class="servicios-grid mejorado">
+                    <div class="servicio-card mejorado">
+                        <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=400&q=80" alt="Entrenamiento Personalizado">
+                        <div class="servicio-info">
+                            <i class="fas fa-user-check"></i>
+                            <h3>Entrenamiento Personalizado</h3>
+                            <p>Programas adaptados a tus objetivos, nivel y disciplina, con seguimiento individual de tu progreso.</p>
+                            <a href="servicios.html#entrenamiento-personal" class="btn btn-secondary">Ver más</a>
+                        </div>
+                    </div>
+                    <div class="servicio-card mejorado">
+                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Cursos Certificados">
+                        <div class="servicio-info">
+                            <i class="fas fa-certificate"></i>
+                            <h3>Cursos Certificados</h3>
+                            <p>Capacítate con cursos avalados por federaciones y obtén certificaciones reconocidas internacionalmente.</p>
+                            <a href="servicios.html#cursos-certificados" class="btn btn-secondary">Ver más</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonios -->
+        <section class="testimonios">
+            <div class="container">
+                <h2>Lo Que Dicen Nuestros Alumnos</h2>
+                <div class="testimonios-row" style="display: flex; flex-wrap: nowrap; gap: 2rem; justify-content: center; align-items: stretch;">
+                    <div class="testimonio" style="flex:1 1 320px; max-width: 370px; min-width: 280px;">
+                        <div class="testimonio-content">
+                            <p style="text-align: justify;">"Como nadador profesional, encontré en esta plataforma el entrenamiento perfecto para mejorar mi técnica y rendimiento."</p>
+                        </div>
+                        <div class="testimonio-autor">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Ana Martínez">
+                            <div>
+                                <h4>Ana Martínez</h4>
+                                <span>Nadadora Profesional</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonio" style="flex:1 1 320px; max-width: 370px; min-width: 280px;">
+                        <div class="testimonio-content">
+                            <p style="text-align: justify;">"Gracias a DeporteFit logré superar mis marcas en ciclismo y ahora participo en competencias internacionales. El acompañamiento es excelente."</p>
+                        </div>
+                        <div class="testimonio-autor">
+                            <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=400&q=80" alt="Carlos Pérez">
+                            <div>
+                                <h4>Carlos Pérez</h4>
+                                <span>Ciclista Amateur</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estadísticas -->
+        <section class="estadisticas">
+            <div class="container">
+                <h2 style="text-align:center; color:#fff; font-size:2.2rem; margin-bottom:2rem; background:#1976d2; border-radius:1rem; padding:0.7rem 0;">Estadísticas DeporteFit 2025</h2>
+                <div class="stats-grid">
+                    <div class="stat-item" style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="stat-number">10+</div>
+                        <div class="stat-label" style="margin-top: 0.3em;">Deportes</div>
+                    </div>
+                    <div class="stat-item" style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="stat-number">30+</div>
+                        <div class="stat-label" style="margin-top: 0.3em;">Entrenadores</div>
+                    </div>
+                    <div class="stat-item" style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="stat-number">200+</div>
+                        <div class="stat-label" style="margin-top: 0.3em;">Alumnos</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 2.5rem 1rem 0 1rem; background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%); border-radius: 1.2rem 1.2rem 0 0; box-shadow: 0 -2px 16px rgba(25, 118, 210, 0.08); color: #fff;">
+            <div class="footer-section" style="flex: 1 1 220px; min-width: 200px; max-width: 260px;">
+                <h3 style="font-weight: 700; letter-spacing: 1px;">DeporteFit</h3>
+                <p style="margin-bottom: 1.2rem;">La plataforma líder en entrenamiento deportivo personalizado con certificaciones profesionales.</p>
+                <div class="social-links" style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <a href="#" style="color: #fff; font-size: 1.3rem;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: #fff; font-size: 1.3rem;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: #fff; font-size: 1.3rem;"><i class="fab fa-twitter"></i></a>
+                    <a href="#" style="color: #fff; font-size: 1.3rem;"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section" style="flex: 1 1 220px; min-width: 200px; max-width: 260px;">
+                <h4 style="font-weight: 600; margin-bottom: 1rem;">Servicios</h4>
+                <ul style="padding-left: 0; list-style: none; line-height: 2;">
+                    <li><a href="#" style="color: #fff; text-decoration: none;">Entrenamiento Personal</a></li>
+                    <li><a href="#" style="color: #fff; text-decoration: none;">Cursos Certificados</a></li>
+                    <li><a href="#" style="color: #fff; text-decoration: none;">Planes de Nutrición</a></li>
+                    <li><a href="#" style="color: #fff; text-decoration: none;">Asesoría Deportiva</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 0; padding: 1.2rem 0 0.5rem 0; color: #fff; font-size: 1.08rem; letter-spacing: 0.5px; background: linear-gradient(90deg, #1565c0 0%, #42a5f5 100%); border-radius: 0 0 1.2rem 1.2rem; box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);">
+            &copy; 2025 DeporteFit. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <script>
+        // Script para el test de responsividad
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            document.getElementById('width').textContent = width;
+            document.getElementById('height').textContent = height;
+            
+            let breakpoint = 'Desktop';
+            if (width <= 479) {
+                breakpoint = 'Móvil Pequeño';
+            } else if (width <= 767) {
+                breakpoint = 'Móvil';
+            } else if (width <= 1023) {
+                breakpoint = 'Tablet';
+            } else if (width <= 1199) {
+                breakpoint = 'Desktop Pequeño';
+            } else if (width <= 1439) {
+                breakpoint = 'Desktop';
+            } else {
+                breakpoint = 'Desktop Grande';
+            }
+            
+            document.getElementById('breakpoint').textContent = breakpoint;
+        }
+        
+        function setViewport(width, height) {
+            // Simular cambio de viewport (solo para testing)
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.setAttribute('content', `width=${width}, initial-scale=1.0`);
+            }
+            
+            // Actualizar información
+            document.getElementById('width').textContent = width;
+            document.getElementById('height').textContent = height;
+            
+            let breakpoint = 'Desktop';
+            if (width <= 479) {
+                breakpoint = 'Móvil Pequeño';
+            } else if (width <= 767) {
+                breakpoint = 'Móvil';
+            } else if (width <= 1023) {
+                breakpoint = 'Tablet';
+            } else if (width <= 1199) {
+                breakpoint = 'Desktop Pequeño';
+            } else if (width <= 1439) {
+                breakpoint = 'Desktop';
+            } else {
+                breakpoint = 'Desktop Grande';
+            }
+            
+            document.getElementById('breakpoint').textContent = breakpoint;
+        }
+        
+        function resetViewport() {
+            // Resetear al viewport original
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.setAttribute('content', 'width=device-width, initial-scale=1.0');
+            }
+            updateViewportInfo();
+        }
+        
+        // Actualizar información al cargar y redimensionar
+        window.addEventListener('load', updateViewportInfo);
+        window.addEventListener('resize', updateViewportInfo);
+        
+        // Actualizar información cada segundo para detectar cambios
+        setInterval(updateViewportInfo, 1000);
+    </script>
+</body>
+</html>

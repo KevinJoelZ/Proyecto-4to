@@ -1,0 +1,111 @@
+/* Admin Dashboard Styles - DeporteFit */
+:root{
+  --bg:#f7fbff;
+  --panel:#ffffff;
+  --primary:#1976d2;
+  --primary-2:#1565c0;
+  --accent:#ff9800;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --success:#2e7d32;
+  --danger:#c62828;
+}
+
+body{
+  margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:linear-gradient(180deg, #f7fbff 0%, #e3f0ff 100%);
+}
+.header{
+  display:flex; justify-content:space-between; align-items:center; padding:14px 18px; background:linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%); color:#fff;
+}
+.header .title{display:flex; align-items:center; gap:.6rem; font-weight:700; letter-spacing:.3px}
+.header .title i{color:#ffb74d}
+.header .actions a{color:#fff; text-decoration:none; margin-left:12px; padding:8px 12px; background:rgba(255,255,255,.12); border-radius:8px}
+.header .actions a:hover{background:rgba(255,255,255,.2)}
+
+.container{
+  max-width:1200px;
+  margin: 0 auto;
+  padding: 24px 16px 36px; /* más espacio arriba y abajo para centrar visualmente */
+}
+
+.dashboard{
+  background:var(--panel); border:1px solid var(--border); box-shadow:0 6px 24px rgba(25,118,210,.08); border-radius:16px; overflow:hidden;
+}
+.tabs{
+  display:flex; gap:4px; background:#f1f5ff; border-bottom:1px solid var(--border); padding:8px;
+}
+.tab{cursor:pointer; padding:10px 14px; border-radius:10px; color:var(--primary); font-weight:600; transition: background .2s ease, color .2s ease, box-shadow .2s ease}
+.tab:hover{ background:#fff; color:var(--text); box-shadow:0 3px 10px rgba(0,0,0,.05) }
+.tab.active{background:#fff; color:var(--text); box-shadow:0 4px 14px rgba(0,0,0,.06)}
+
+/* Línea indicadora sutil para la pestaña activa */
+.tab.active{ position: relative; }
+.tab.active::after{ content:''; position:absolute; left:10px; right:10px; bottom:-6px; height:3px; background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%); border-radius:2px }
+
+.tab-content{ display:none; padding:18px; }
+.tab-content.active{ display:block; }
+
+.grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+@media (max-width:900px){ .grid{grid-template-columns:1fr} }
+
+.card{ background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px; box-shadow:0 3px 12px rgba(0,0,0,.05)}
+.card h3{ margin:6px 0 12px; color:var(--text) }
+.muted{ color:var(--muted) }
+
+/* Encabezados de tarjeta más definidos */
+.card h3{ display:flex; align-items:center; gap:.5rem; font-weight:700 }
+.card h3 i{ color: var(--accent) }
+
+.btn{ display:inline-flex; align-items:center; gap:.5rem; border:1px solid var(--border); background:#fff; color:var(--text); padding:8px 12px; border-radius:8px; cursor:pointer }
+.btn.primary{ background: linear-gradient(90deg, var(--primary) 0%, var(--primary-2) 100%); color:#fff; border:none }
+.btn.success{ background: linear-gradient(90deg, #2e7d32 0%, #43a047 100%); color:#fff; border:none }
+.btn.danger{ background: linear-gradient(90deg, #e53935 0%, #c62828 100%); color:#fff; border:none }
+.btn:disabled{ opacity:.6; cursor:not-allowed }
+
+.input, textarea, select{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff }
+.table{ width:100%; border-collapse: collapse }
+.table th, .table td{ padding:10px 12px; border-bottom:1px solid var(--border); text-align:left }
+.table th{ background:#f9fafb; color:var(--muted); font-weight:600 }
+.table tbody tr:nth-child(odd){ background:#fcfdff }
+.table tbody tr:hover{ background:#f6f9ff }
+
+.kpis{ display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; margin-bottom:14px }
+.kpi{ background:#fff; border:1px solid var(--border); padding:16px; border-radius:12px }
+.kpi .num{ font-size:1.4rem; font-weight:800; color:var(--primary) }
+
+.notice{ margin-top:8px; font-size:.92rem }
+.notice.success{ color:var(--success) }
+.notice.error{ color:var(--danger) }
+
+/* Responsive Enhancements */
+@media (max-width: 1024px){
+  .container{ padding: 0 12px; }
+  .grid{ grid-template-columns: 1fr; }
+  .kpis{ grid-template-columns: repeat(2, 1fr); }
+  .tab{ padding: 10px 12px; }
+}
+
+@media (max-width: 768px){
+  .header{ flex-direction: column; align-items: flex-start; gap: .6rem; }
+  .header .actions{ width: 100%; display: flex; gap: .6rem; flex-wrap: wrap; }
+  .header .actions a{ flex: 1 1 auto; text-align: center; }
+
+  .tabs{ flex-wrap: wrap; gap: 6px; }
+  .tab{ flex: 1 1 auto; text-align: center; }
+
+  .kpis{ grid-template-columns: 1fr; }
+
+  .card{ padding: 12px; }
+  .input, textarea, select{ padding: 9px 10px; }
+
+  .table{ display: block; overflow-x: auto; white-space: nowrap; }
+  .table thead th{ position: sticky; top: 0; background: #f9fafb; z-index: 1; }
+}
+
+@media (max-width: 480px){
+  .header .title{ width: 100%; justify-content: space-between; }
+  .btn{ padding: 8px 10px; font-size: .95rem; }
+  .btn.primary, .btn.success, .btn.danger{ min-width: 110px; justify-content: center; }
+  .notice{ font-size: .88rem; }
+}

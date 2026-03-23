@@ -1,0 +1,26 @@
+# Archivos de base de datos
+*.sql
+*.db
+*.sqlite
+
+# Archivos de configuración sensibles
+conexión.php
+
+# Archivos temporales
+*.tmp
+*.temp
+*.log
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de respaldo
+*.bak
+*.backup
