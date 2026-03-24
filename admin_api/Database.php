@@ -66,7 +66,9 @@ class Database {
             $stmt->bind_param($types, ...$params);
         }
         
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception("Error al ejecutar query: " . $stmt->error);
+        }
         $result = $stmt->get_result();
         
         return $result;
@@ -87,7 +89,9 @@ class Database {
             $stmt->bind_param($types, ...$params);
         }
         
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception("Error al ejecutar sentencia: " . $stmt->error);
+        }
         
         return [
             'affected_rows' => $stmt->affected_rows,

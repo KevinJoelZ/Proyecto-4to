@@ -100,6 +100,13 @@
                     
                     <form id="formEjercicio">
                         <div class="av-form-group">
+                            <label class="av-form-label">Rutina</label>
+                            <select class="av-form-select" id="rutinaEjercicio" required>
+                                <option value="">Selecciona una rutina</option>
+                            </select>
+                        </div>
+
+                        <div class="av-form-group">
                             <label class="av-form-label">Ejercicio</label>
                             <input type="text" class="av-form-input" id="nombreEjercicio" placeholder="Ej: Sentadillas" required>
                         </div>
@@ -597,6 +604,7 @@
         // Usuario actual (en producción vendría de la sesión)
         const USUARIO_ID = 'demo_user';
         const API_BASE = 'admin_api';
+        let ejerciciosPendientes = [];
         
         // Configurar fecha actual en el formulario de peso
         document.getElementById('fechaPeso').valueAsDate = new Date();
@@ -622,16 +630,37 @@
         
         // Función para mostrar notificaciones
         function showNotification(message, type = 'success') {
+            let toastContainer = document.getElementById('av-toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'av-toast-container';
+                toastContainer.style.position = 'fixed';
+                toastContainer.style.top = '1rem';
+                toastContainer.style.right = '1rem';
+                toastContainer.style.zIndex = '9999';
+                toastContainer.style.width = 'min(420px, calc(100vw - 2rem))';
+                toastContainer.style.pointerEvents = 'none';
+                document.body.appendChild(toastContainer);
+            }
+
             const notification = document.createElement('div');
             notification.className = `av-alert av-alert-${type}`;
             notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
-            const wrapper = document.querySelector('.av-wrapper');
-            wrapper.insertBefore(notification, wrapper.firstChild);
+            notification.style.pointerEvents = 'auto';
+            toastContainer.prepend(notification);
             notification.style.animation = 'slideDown 0.3s ease-out';
             setTimeout(() => {
                 notification.style.animation = 'fadeIn 0.3s ease-out reverse';
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
+        }
+
+        function limpiarFormularioEjercicio() {
+            document.getElementById('nombreEjercicio').value = '';
+            document.getElementById('seriesEjercicio').value = '';
+            document.getElementById('repeticionesEjercicio').value = '';
+            document.getElementById('pesoEjercicio').value = '';
+            document.getElementById('descansoEjercicio').value = '60';
         }
         
         // ==================== API: RUTINAS ====================
@@ -641,6 +670,10 @@
             try {
                 const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}`);
                 const result = await response.json();
+                const selectRutina = document.getElementById('rutinaEjercicio');
+                if (selectRutina) {
+                    selectRutina.innerHTML = '<option value="">Selecciona una rutina</option>';
+                }
                 
                 if (result.success && result.data.length > 0) {
                     const tbody = document.getElementById('cuerpoTablaRutinas');
@@ -651,6 +684,12 @@
                     
                     result.data.forEach(rutina => {
                         const fecha = new Date(rutina.fecha_creacion).toLocaleDateString('es-ES');
+                        if (selectRutina) {
+                            const option = document.createElement('option');
+                            option.value = rutina.id;
+                            option.textContent = rutina.nombre;
+                            selectRutina.appendChild(option);
+                        }
                         tbody.innerHTML += `
                             <tr>
                                 <td><strong>${rutina.nombre}</strong></td>
@@ -680,7 +719,8 @@
                 tipo: document.getElementById('tipoRutina').value,
                 dificultad: document.getElementById('dificultadRutina').value,
                 duracion: parseInt(document.getElementById('duracionRutina').value),
-                notas: document.getElementById('notasRutina').value
+                notas: document.getElementById('notasRutina').value,
+                ejercicios: ejerciciosPendientes
             };
             
             try {
@@ -692,11 +732,50 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showNotification('¡Rutina creada exitosamente!');
+                    showNotification('Rutina guardada con exito');
                     this.reset();
+                    ejerciciosPendientes = [];
                     cargarRutinas();
                 } else {
                     showNotification(result.message || 'Error al crear rutina', 'error');
+                }
+            } catch (error) {
+                showNotification('Error de conexión', 'error');
+            }
+        });
+
+        // Agregar ejercicio para guardarlo junto con la rutina
+        document.getElementById('formEjercicio').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const ejercicio = {
+                rutina_id: parseInt(document.getElementById('rutinaEjercicio').value, 10),
+                nombre: document.getElementById('nombreEjercicio').value.trim(),
+                series: parseInt(document.getElementById('seriesEjercicio').value, 10),
+                repeticiones: parseInt(document.getElementById('repeticionesEjercicio').value, 10),
+                peso: document.getElementById('pesoEjercicio').value ? parseFloat(document.getElementById('pesoEjercicio').value) : null,
+                descanso: parseInt(document.getElementById('descansoEjercicio').value, 10)
+            };
+
+            if (!ejercicio.rutina_id || !ejercicio.nombre || !ejercicio.series || !ejercicio.repeticiones) {
+                showNotification('Completa todos los campos obligatorios del ejercicio', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}&accion=agregar_ejercicio`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(ejercicio)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    limpiarFormularioEjercicio();
+                    showNotification('Ejercicio agregado con exito');
+                    cargarRutinas();
+                } else {
+                    showNotification(result.message || 'Error al agregar ejercicio', 'error');
                 }
             } catch (error) {
                 showNotification('Error de conexión', 'error');

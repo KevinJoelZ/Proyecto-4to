@@ -61,7 +61,10 @@ class Rutina extends ModeloBase {
                     $ejercicio['rutina_id'] = $rutinaId;
                     $ejercicio['orden'] = $index;
                     
-                    $this->createEjercicio($ejercicio);
+                    $insertEjercicio = $this->createEjercicio($ejercicio);
+                    if (($insertEjercicio['affected_rows'] ?? 0) <= 0) {
+                        throw new Exception($insertEjercicio['error'] ?? 'No se pudo crear el ejercicio');
+                    }
                 }
             }
             

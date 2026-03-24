@@ -5,6 +5,8 @@
  * Clase abstracta que proporciona métodos comunes para todos los modelos
  */
 
+require_once __DIR__ . '/Database.php';
+
 abstract class ModeloBase {
     protected $db;
     protected $tableName;
@@ -68,11 +70,19 @@ abstract class ModeloBase {
         
         $result = $this->db->execute($sql, array_values($data));
         
-        return [
-            'success' => $result['affected_rows'] > 0,
-            'id' => $result['insert_id'],
-            'error' => $result['error']
-        ];
+        if ($result['affected_rows'] > 0) {
+            return [
+                'success' => true,
+                'id' => $result['insert_id'],
+                'error' => null
+            ];
+        } else {
+            return [
+                'success' => false,
+                'id' => null,
+                'error' => $result['error'] ?? 'Error al crear registro'
+            ];
+        }
     }
     
     /**

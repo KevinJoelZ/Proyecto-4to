@@ -82,11 +82,18 @@ class Progreso extends ModeloBase {
         
         $result = $this->db->execute($sql, $params);
         
-        return [
-            'success' => $result['affected_rows'] > 0,
-            'id' => $result['insert_id'],
-            'error' => $result['error']
-        ];
+        if ($result['affected_rows'] > 0) {
+            return [
+                'success' => true,
+                'message' => 'Medidas corporales guardadas exitosamente',
+                'id' => $result['insert_id']
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Error al guardar medidas: ' . ($result['error'] ?? 'Error desconocido')
+            ];
+        }
     }
     
     // ===== ENTRENAMIENTOS =====
@@ -144,14 +151,25 @@ class Progreso extends ModeloBase {
         
         $result = $this->db->execute($sql, $params);
         
-        // Actualizar objetivo de entrenamientos semanales
-        $this->actualizarObjetivoEntrenamientos($data['usuario_id']);
+        // Actualizar objetivo de entrenamientos semanales (ignorar errores si no existe objetivo)
+        try {
+            $this->actualizarObjetivoEntrenamientos($data['usuario_id']);
+        } catch (Exception $e) {
+            // Ignorar errores al actualizar objetivos - no es crítico
+        }
         
-        return [
-            'success' => $result['affected_rows'] > 0,
-            'id' => $result['insert_id'],
-            'error' => $result['error']
-        ];
+        if ($result['affected_rows'] > 0) {
+            return [
+                'success' => true,
+                'message' => 'Entrenamiento registrado exitosamente',
+                'id' => $result['insert_id']
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Error al registrar entrenamiento: ' . ($result['error'] ?? 'Error desconocido')
+            ];
+        }
     }
     
     /**

@@ -6,6 +6,10 @@
  * Usa las clases POO: Database, Progreso, Estadistica
  */
 
+// Configurar manejo de errores
+error_reporting(0);
+ini_set('display_errors', 0);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
@@ -18,23 +22,28 @@ $method = $_SERVER['REQUEST_METHOD'];
 $usuario_id = isset($_GET['usuario_id']) ? $_GET['usuario_id'] : 'demo_user';
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'peso';
 
-switch ($method) {
-    case 'GET':
-        getProgresos($usuario_id, $tipo);
-        break;
-    case 'POST':
-        crearProgreso($usuario_id, $tipo);
-        break;
-    case 'PUT':
-        actualizarProgreso($tipo);
-        break;
-    case 'DELETE':
-        eliminarProgreso($tipo);
-        break;
-    default:
-        http_response_code(405);
-        echo json_encode(['success' => false, 'message' => 'Método no permitido']);
-        break;
+try {
+    switch ($method) {
+        case 'GET':
+            getProgresos($usuario_id, $tipo);
+            break;
+        case 'POST':
+            crearProgreso($usuario_id, $tipo);
+            break;
+        case 'PUT':
+            actualizarProgreso($tipo);
+            break;
+        case 'DELETE':
+            eliminarProgreso($tipo);
+            break;
+        default:
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            break;
+    }
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error del servidor: ' . $e->getMessage()]);
 }
 
 /**
@@ -130,11 +139,18 @@ function crearPesoPOO($progreso, $usuario_id, $data) {
         'notas' => $notas
     ]);
     
-    return [
-        'success' => $result['affected_rows'] > 0,
-        'message' => $result['affected_rows'] > 0 ? 'Peso registrado' : 'Error al registrar',
-        'id' => $result['insert_id'] ?? null
-    ];
+    if ($result['success']) {
+        return [
+            'success' => true,
+            'message' => 'Peso registrado exitosamente',
+            'id' => $result['id']
+        ];
+    } else {
+        return [
+            'success' => false,
+            'message' => 'Error al registrar peso: ' . ($result['error'] ?? 'Error desconocido')
+        ];
+    }
 }
 
 /**

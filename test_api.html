@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API - DeporteFit</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        h1 { color: #2c3e50; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        button { background: #3498db; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+        button:hover { background: #2980b9; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Prueba de APIs - DeporteFit</h1>
+    <p>Haz clic en los botones para probar cada función:</p>
+    
+    <div class="test-section">
+        <h3>1. Verificar tablas existentes</h3>
+        <button onclick="testGetRutinas()">Obtener Rutinas</button>
+        <button onclick="testGetProgresos()">Obtener Progresos Peso</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Crear nuevos registros</h3>
+        <button onclick="testCrearRutina()">Crear Rutina de Prueba</button>
+        <button onclick="testRegistrarPeso()">Registrar Peso</button>
+        <button onclick="testRegistrarMedidas()">Registrar Medidas</button>
+        <button onclick="testRegistrarEntrenamiento()">Registrar Entrenamiento</button>
+    </div>
+    
+    <div id="results">
+        <h3>Resultados:</h3>
+        <pre id="output">Haz clic en un botón para comenzar las pruebas...</pre>
+    </div>
+
+    <script>
+        const API_BASE = 'admin_api';
+        const USUARIO_ID = 'demo_user';
+        
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✓' : type === 'error' ? '✗' : type === 'warning' ? '⚠' : '•';
+            output.textContent += `\n[${timestamp}] ${prefix} ${message}`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function logJson(data) {
+            const output = document.getElementById('output');
+            output.textContent += '\n' + JSON.stringify(data, null, 2);
+        }
+        
+        async function testGetRutinas() {
+            log('Probando: Obtener Rutinas...');
+            try {
+                const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}`);
+                const result = await response.json();
+                if (result.success) {
+                    log(`Éxito: ${result.data.length} rutinas encontradas`, 'success');
+                } else {
+                    log(`Error: ${result.message}`, 'error');
+                }
+                logJson(result);
+            } catch (e) {
+                log(`Error de conexión: ${e.message}`, 'error');
+            }
+        }
+        
+        async function testGetProgresos() {
+            log('Probando: Obtener Progresos Peso...');
+            try {
+                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=peso`);
+                const result = await response.json();
+                if (result.success) {
+                    log(`Éxito: ${result.data.length} registros encontrados`, 'success');
+                } else {
+                    log(`Error: ${result.message}`, 'error');
+                }
+                logJson(result);
+            } catch (e) {
+                log(`Error de conexión: ${e.message}`, 'error');
+            }
+        }
+        
+        async function testCrearRutina() {
+            log('Probando: Crear Rutina...');
+            try {
+                const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nombre: 'Rutina de Prueba ' + new Date().toLocaleTimeString(),
+                        tipo: 'fuerza',
+                        dificultad: 'principiante',
+                        duracion: 45,
+                        notas: 'Esta es una prueba',
+                        ejercicios: [
+                            { nombre: 'Flexiones', series: 3, repeticiones: 10, peso: null, descanso: 60 }
+                        ]
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    log(`Éxito: ${result.message}`, 'success');
+                } else {
+                    log(`Error: ${result.message}`, 'error');
+                }
+                logJson(result);
+            } catch (e) {
+                log(`Error de conexión: ${e.message}`, 'error');
+            }
+        }
+        
+        async function testRegistrarPeso() {
+            log('Probando: Registrar Peso...');
+            try {
+                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=peso`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        peso: 75.5,
+                        fecha: new Date().toISOString().split('T')[0],
+                        notas: 'Peso de prueba'
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    log(`Éxito: ${result.message}`, 'success');
+                } else {
+                    log(`Error: ${result.message}`, 'error');
+                }
+                logJson(result);
+            } catch (e) {
+                log(`Error de conexión: ${e.message}`, 'error');
+            }
+        }
+        
+        async function testRegistrarMedidas() {
+            log('Probando: Registrar Medidas...');
+            try {
+                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=medidas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fecha: new Date().toISOString().split('T')[0],
+                        pecho: 100.5,
+                        cintura: 82.0,
+                        cadera: 94.5,
+                        biceps: 35.0,
+                        pierna: 55.0,
+                        notas: 'Medidas de prueba'
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    log(`Éxito: ${result.message}`, 'success');
+                } else {
+                    log(`Error: ${result.message}`, 'error');
+                }
+                logJson(result);
+            } catch (e) {
+                log(`Error de conexión: ${e.message}`, 'error');
+            }
+        }
+        
+        async function testRegistrarEntrenamiento() {
+            log('Probando: Registrar Entrenamiento...');
+            try {
+                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=entrenamientos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        rutina_id: 1,
+                        nombre_rutina: 'Rutina de Prueba',
+                        intensidad: 7,
+                        sensacion: 'bien',
+                        duracion: 45,
+                        calorias: 250
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    log(`Éxito: ${result.message}`, 'success');
+                } else {
+                    log(`Error: ${result.message}`, 'error');
+                }
+                logJson(result);
+            } catch (e) {
+                log(`Error de conexión: ${e.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
