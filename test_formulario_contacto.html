@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Formulario de Contacto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1976d2;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e3f2fd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #4fc3f7;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.02);
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 300px;
+            max-width: 400px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification.success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            border-left: 4px solid #81c784;
+        }
+        .notification.error {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+            border-left: 4px solid #ef5350;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prueba Formulario de Contacto</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">
+            Este formulario envía datos a: <strong>Procesamientof/procesar_formularios.php</strong>
+        </p>
+        
+        <form id="contactoForm">
+            <input type="hidden" name="form_type" value="contacto">
+            
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" pattern="[0-9]{10}" placeholder="Ej: 0991234567">
+            </div>
+            
+            <div class="form-group">
+                <label for="motivo">Motivo de contacto:</label>
+                <select id="motivo" name="motivo" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="informacion">Solicitar información</option>
+                    <option value="soporte">Soporte técnico</option>
+                    <option value="entrenadores">Contactar entrenador</option>
+                    <option value="otros">Otros</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="mensaje">Mensaje:</label>
+                <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="privacidad" name="privacidad" required style="width: auto; margin-right: 10px;">
+                    Acepto la política de privacidad
+                </label>
+            </div>
+            
+            <button type="submit">Enviar Mensaje</button>
+        </form>
+        
+        <div class="debug-info" id="debugInfo">
+            <strong>Información de depuración:</strong><br>
+            Esperando envío del formulario...
+        </div>
+    </div>
+    
+    <!-- Notificación Toast -->
+    <div id="notification" class="notification">
+        <span id="notification-message"></span>
+        <button class="close-btn" onclick="hideNotification()">&times;</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contactoForm');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            // Manejo del envío con AJAX
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validación simple
+                const nombre = form.nombre.value.trim();
+                const email = form.email.value.trim();
+                const telefono = form.telefono.value.trim();
+                const motivo = form.motivo.value.trim();
+                const mensaje = form.mensaje.value.trim();
+                const privacidad = form.privacidad.checked;
+                
+                debugInfo.innerHTML = '<strong>Información de depuración:</strong><br>';
+                debugInfo.innerHTML += 'Validando formulario...<br>';
+                
+                if (!nombre || !email || !telefono || !motivo || !mensaje || !privacidad) {
+                    showNotification('error', 'Por favor, completa todos los campos obligatorios y acepta la política de privacidad.');
+                    debugInfo.innerHTML += '<span style="color: red;">✗ Validación fallida</span><br>';
+                    return false;
+                }
+                
+                if (!validateEmail(email)) {
+                    showNotification('error', 'Por favor, ingresa un correo electrónico válido.');
+                    debugInfo.innerHTML += '<span style="color: red;">✗ Email inválido</span><br>';
+                    return false;
+                }
+                
+                debugInfo.innerHTML += '<span style="color: green;">✓ Validación exitosa</span><br>';
+                debugInfo.innerHTML += 'Enviando datos...<br>';
+                
+                // Enviar con AJAX
+                const formData = new FormData(form);
+                formData.append('form_type', 'contacto');
+                
+                debugInfo.innerHTML += 'URL: Procesamientof/procesar_formularios.php<br>';
+                debugInfo.innerHTML += 'Datos: ' + JSON.stringify(Object.fromEntries(formData)) + '<br>';
+                
+                fetch('Procesamientof/procesar_formularios.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    debugInfo.innerHTML += 'Respuesta recibida. Status: ' + response.status + '<br>';
+                    return response.json();
+                })
+                .then(data => {
+                    debugInfo.innerHTML += 'Respuesta JSON: ' + JSON.stringify(data) + '<br>';
+                    
+                    if (data.success) {
+                        showNotification('success', '¡Éxito! Tu mensaje de contacto ha sido enviado. Te contactaremos pronto.');
+                        form.reset(); // Limpiar formulario
+                        debugInfo.innerHTML += '<span style="color: green;">✓ Mensaje enviado exitosamente</span><br>';
+                    } else {
+                        showNotification('error', data.message || 'Hubo un error al enviar el mensaje. Inténtalo nuevamente.');
+                        debugInfo.innerHTML += '<span style="color: red;">✗ Error: ' + (data.message || 'Error desconocido') + '</span><br>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('error', 'Hubo un error al enviar el mensaje. Inténtalo nuevamente.');
+                    debugInfo.innerHTML += '<span style="color: red;">✗ Error de conexión: ' + error.message + '</span><br>';
+                });
+            });
+            
+            // Función de validación de email
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+        });
+        
+        // Funciones de notificación
+        function showNotification(type, message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+        
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.remove('show');
+        }
+    </script>
+</body>
+</html>

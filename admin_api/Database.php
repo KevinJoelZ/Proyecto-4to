@@ -14,7 +14,7 @@ class Database {
     private $host = 'localhost';
     private $username = 'root';
     private $password = '';
-    private $database = 'guardarbd';
+    private $database = 'plataforma_fitness';
     
     /**
      * Constructor - Establece la conexión a la base de datos

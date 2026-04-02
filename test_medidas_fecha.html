@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Corrección de Fecha en Medidas Corporales</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #1976d2; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #1976d2; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { background: #1565c0; }
+        .success { background: #4caf50; }
+        .success:hover { background: #45a049; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 5px; color: white; z-index: 1000; max-width: 400px; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .hidden { display: none; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; }
+        .medidas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .status { padding: 10px; margin: 10px 0; border-radius:5px; }
+        .status.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #4caf50; }
+        .status.error { background: #ffebee; color: #c62828; border: 1px solid #f44336; }
+        .status.info { background: #e3f2fd; color: #1565c0; border: 1px solid #1976d2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📏 Test - Corrección de Fecha en Medidas Corporales</h1>
+        <p>Este test verifica que la fecha de medición se muestre correctamente en el historial.</p>
+        
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: #ff9800;">📏 Formulario de Medidas Corporales</h3>
+            <div class="form-group">
+                <label>Fecha de Medición:</label>
+                <input type="date" id="fechaMedicion" value="2026-03-27">
+            </div>
+            
+            <div class="medidas-grid">
+                <div class="form-group">
+                    <label>Pecho (cm):</label>
+                    <input type="number" id="pecho" value="101" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Cintura (cm):</label>
+                    <input type="number" id="cintura" value="82.5" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Cadera (cm):</label>
+                    <input type="number" id="cadera" value="94.8" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Bíceps (cm):</label>
+                    <input type="number" id="biceps" value="34.2" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Pierna (cm):</label>
+                    <input type="number" id="pierna" value="55.6" step="0.1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Notas:</label>
+                <textarea id="notas" rows="2">Test de corrección de fecha en medidas corporales</textarea>
+            </div>
+            
+            <button onclick="registrarMedidas()" class="success" style="width: 100%;">📏 Registrar Medidas Corporales</button>
+        </div>
+        
+        <div id="statusContainer">
+            <div class="status info">⏳ Esperando registro de medidas...</div>
+        </div>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>📊 Resultado del Test:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <script>
+        function mostrarNotificacion(type, message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 4000);
+        }
+        
+        function actualizarStatus(mensaje, tipo = 'info') {
+            const statusContainer = document.getElementById('statusContainer');
+            statusContainer.innerHTML = `<div class="status ${tipo}">${mensaje}</div>`;
+        }
+        
+        function registrarMedidas() {
+            actualizarStatus('📝 Enviando medidas corporales...', 'info');
+            
+            const formData = new FormData();
+            formData.append('form_type', 'medidas');
+            formData.append('usuario_id', 'demo_user');
+            formData.append('fecha_medicion', document.getElementById('fechaMedicion').value);
+            formData.append('pecho', document.getElementById('pecho').value);
+            formData.append('cintura', document.getElementById('cintura').value);
+            formData.append('cadera', document.getElementById('cadera').value);
+            formData.append('biceps', document.getElementById('biceps').value);
+            formData.append('pierna', document.getElementById('pierna').value);
+            formData.append('notas', document.getElementById('notas').value);
+            
+            fetch('Procesamientof/procesar_formularios.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('📥 Respuesta del servidor:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📋 Datos procesados:', data);
+                
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('resultContent');
+                resultDiv.style.display = 'block';
+                
+                if (data.success) {
+                    actualizarStatus('✅ Medidas registradas correctamente', 'success');
+                    resultContent.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ Éxito:</strong> ${data.message}
+                        </div>
+                        <p><strong>📅 Fecha enviada:</strong> ${document.getElementById('fechaMedicion').value}</p>
+                        <p><strong>🔍 Próximo paso:</strong> Ve a avance.php → "Registrar Progresos" y verifica el historial de medidas</p>
+                        <p><strong>📊 Verificación:</strong> La fecha en el historial debe ser exactamente "${document.getElementById('fechaMedicion').value}"</p>
+                        <p><strong>⚠️ Importante:</strong> No debe aparecer "Invalid Date" ni fecha incorrecta</p>
+                    `;
+                    
+                    mostrarNotificacion('success', '✅ Medidas registradas - Verifica el historial');
+                    
+                    // Abrir avance.php para verificación automática
+                    setTimeout(() => {
+                        window.open('avance.php', '_blank');
+                    }, 2000);
+                    
+                } else {
+                    actualizarStatus('❌ Error al registrar medidas', 'error');
+                    resultContent.innerHTML = `
+                        <div class="status error">
+                            <strong>❌ Error:</strong> ${data.message}
+                        </div>
+                        <p><strong>🔍 Detalles del error:</strong> Revisa los datos enviados y el mensaje del servidor</p>
+                    `;
+                    mostrarNotificacion('error', '❌ Error al registrar medidas');
+                }
+            })
+            .catch(error => {
+                console.error('💥 Error en la petición:', error);
+                actualizarStatus('💥 Error de conexión', 'error');
+                
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('resultContent');
+                resultDiv.style.display = 'block';
+                resultContent.innerHTML = `
+                    <div class="status error">
+                        <strong>💥 Error de conexión:</strong> ${error.message}
+                    </div>
+                    <p><strong>🔍 Verifica:</strong> Revisa tu conexión a internet y que el servidor esté funcionando</p>
+                `;
+                mostrarNotificacion('error', '💥 Error de conexión');
+            });
+        }
+        
+        // Verificar estado inicial
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                actualizarStatus('✅ Listo para probar corrección de fecha en medidas corporales', 'success');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rápido - Formulario Servicios</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #1976d2; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1565c0; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 5px; color: white; z-index: 1000; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Rápido - Formulario de Servicios</h1>
+        <p>Este es un test simplificado para verificar que el formulario de servicios funcione correctamente.</p>
+        
+        <form id="testForm">
+            <input type="hidden" name="form_type" value="servicios">
+            
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required value="Usuario Test">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" required value="test@servicios.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" value="0991234567">
+            </div>
+            
+            <div class="form-group">
+                <label for="motivo">Motivo de contacto:</label>
+                <select id="motivo" name="motivo" required>
+                    <option value="informacion" selected>Solicitar información</option>
+                    <option value="soporte">Soporte técnico</option>
+                    <option value="entrenadores">Contactar entrenador</option>
+                    <option value="otros">Otros</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="mensaje">Mensaje:</label>
+                <textarea id="mensaje" name="mensaje" rows="3" required>Este es un mensaje de prueba para el formulario de servicios.</textarea>
+            </div>
+            
+            <button type="submit">🚀 Enviar Test</button>
+        </form>
+        
+        <div id="result" style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; display: none;">
+            <h3>Resultado:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Test de servicios iniciado');
+            
+            const form = document.getElementById('testForm');
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('📝 Enviando test...');
+                
+                // Validación
+                const nombre = form.nombre.value.trim();
+                const email = form.email.value.trim();
+                const motivo = form.motivo.value.trim();
+                const mensaje = form.mensaje.value.trim();
+                
+                if (!nombre || !email || !motivo || !mensaje) {
+                    showNotification('error', 'Por favor, completa todos los campos obligatorios.');
+                    return;
+                }
+                
+                // Enviar con AJAX
+                const formData = new FormData(form);
+                
+                showNotification('success', 'Enviando test...');
+                
+                fetch('Procesamientof/procesar_formularios.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('📥 Respuesta:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📋 Datos:', data);
+                    
+                    // Mostrar resultado
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>Estado:</strong> ${data.success ? '✅ Éxito' : '❌ Error'}</p>
+                        <p><strong>Mensaje:</strong> ${data.message}</p>
+                        <p><strong>Tiempo:</strong> ${new Date().toLocaleTimeString()}</p>
+                    `;
+                    
+                    if (data.success) {
+                        showNotification('success', data.message);
+                        // No limpiamos el formulario para poder hacer múltiples tests
+                    } else {
+                        showNotification('error', data.message || 'Error desconocido');
+                    }
+                })
+                .catch(error => {
+                    console.error('💥 Error:', error);
+                    showNotification('error', 'Error de conexión: ' + error.message);
+                    
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>Estado:</strong> ❌ Error de conexión</p>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Verifica:</strong></p>
+                        <ul>
+                            <li>Que XAMPP esté corriendo</li>
+                            <li>Que la base de datos plataforma_fitness exista</li>
+                            <li>Que el archivo procesar_formularios.php exista</li>
+                        </ul>
+                    `;
+                });
+            });
+            
+            function showNotification(type, message) {
+                const notification = document.getElementById('notification');
+                const messageEl = document.getElementById('notification-message');
+                
+                messageEl.textContent = message;
+                notification.className = `notification ${type}`;
+                
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

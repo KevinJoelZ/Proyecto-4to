@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Historial de Progresos</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #1976d2; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
+        .section h3 { color: #1976d2; margin-top: 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        .card { border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; background: white; }
+        .card h4 { margin: 0 0 0.5rem 0; color: #1976d2; }
+        .card p { margin: 0.25rem 0; color: #666; font-size: 0.9rem; }
+        .badge { display: inline-block; background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin: 0.25rem; }
+        .badge.peso { background: #e8f5e9; color: #4caf50; }
+        .badge.medida { background: #fff3e0; color: #ff9800; }
+        .badge.entrenamiento { background: #fce4ec; color: #e91e63; }
+        button { background: #1976d2; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { background: #1565c0; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 5px; color: white; z-index: 1000; max-width: 350px; }
+        .hidden { display: none; }
+        .spinner { text-align: center; padding: 2rem; color: #666; }
+        .spinner i { font-size: 2rem; margin-bottom: 1rem; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Test - Historial de Progresos</h1>
+        <p>Este test verifica que el historial de progresos (peso, medidas y entrenamientos) se muestre correctamente.</p>
+        
+        <button onclick="cargarHistorialProgresos()" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+            🔄 Cargar Historial de Progresos
+        </button>
+        
+        <!-- Sección de Peso -->
+        <div class="section">
+            <h3><i class="fas fa-weight"></i> Historial de Peso</h3>
+            <div id="historialPeso">
+                <div class="spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando historial de peso...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección de Medidas -->
+        <div class="section">
+            <h3><i class="fas fa-ruler"></i> Historial de Medidas Corporales</h3>
+            <div id="historialMedidas">
+                <div class="spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando historial de medidas...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección de Entrenamientos -->
+        <div class="section">
+            <h3><i class="fas fa-dumbbell"></i> Historial de Entrenamientos Realizados</h3>
+            <div id="historialEntrenamientos">
+                <div class="spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando historial de entrenamientos...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="resultado" style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; display: none;">
+            <h3>📊 Resultado:</h3>
+            <div id="resultadoContenido"></div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <script>
+        function mostrarNotificacion(type, message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function cargarHistorialProgresos() {
+            console.log('🔄 Cargando historial de progresos...');
+            
+            const divPeso = document.getElementById('historialPeso');
+            const divMedidas = document.getElementById('historialMedidas');
+            const divEntrenamientos = document.getElementById('historialEntrenamientos');
+            
+            // Mostrar estados de carga
+            if (divPeso) {
+                divPeso.innerHTML = `
+                    <div class="spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando historial de peso...</p>
+                    </div>
+                `;
+            }
+            
+            if (divMedidas) {
+                divMedidas.innerHTML = `
+                    <div class="spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando historial de medidas...</p>
+                    </div>
+                `;
+            }
+            
+            if (divEntrenamientos) {
+                divEntrenamientos.innerHTML = `
+                    <div class="spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando historial de entrenamientos...</p>
+                    </div>
+                `;
+            }
+            
+            fetch('Procesamientof/cargar_historial_progresos.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'cargar_historial_progresos', usuario_id: 'demo_user' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Historial de progresos recibido:', data);
+                
+                const resultadoDiv = document.getElementById('resultado');
+                const resultadoContenido = document.getElementById('resultadoContenido');
+                
+                if (data.success) {
+                    // Renderizar peso
+                    if (divPeso && data.pesos) {
+                        if (data.pesos.length === 0) {
+                            divPeso.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-weight" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay registros de peso aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divPeso.innerHTML = data.pesos.map((peso, index) => {
+                                const esMasReciente = index === 0;
+                                const fechaCorrecta = new Date(peso.fecha_medicion + 'T00:00:00');
+                                return `
+                                    <div class="card" style="${esMasReciente ? 'border-left: 4px solid #4caf50;' : ''}">
+                                        <h4>⚖️ ${peso.peso} kg ${esMasReciente ? ' 🆕' : ''}</h4>
+                                        <p>📅 ${fechaCorrecta.toLocaleDateString()}</p>
+                                        ${peso.notas ? `<p style="font-style: italic;">${peso.notas}</p>` : ''}
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    }
+                    
+                    // Renderizar medidas
+                    if (divMedidas && data.medidas) {
+                        if (data.medidas.length === 0) {
+                            divMedidas.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-ruler" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay registros de medidas aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divMedidas.innerHTML = data.medidas.map((medida, index) => {
+                                const esMasReciente = index === 0;
+                                const fechaCorrecta = new Date(medida.fecha_medicion + 'T00:00:00');
+                                return `
+                                    <div class="card" style="${esMasReciente ? 'border-left: 4px solid #ff9800;' : ''}">
+                                        <h4>📏 Medidas ${esMasReciente ? ' 🆕' : ''}</h4>
+                                        <p>📅 ${fechaCorrecta.toLocaleDateString()}</p>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                                            ${medida.pecho ? `<span class="badge medida">🏋️ Pecho: ${medida.pecho} cm</span>` : ''}
+                                            ${medida.cintura ? `<span class="badge medida">📐 Cintura: ${medida.cintura} cm</span>` : ''}
+                                            ${medida.cadera ? `<span class="badge medida">🦵 Cadera: ${medida.cadera} cm</span>` : ''}
+                                            ${medida.biceps ? `<span class="badge medida">💪 Bíceps: ${medida.biceps} cm</span>` : ''}
+                                            ${medida.pierna ? `<span class="badge medida">🦿 Pierna: ${medida.pierna} cm</span>` : ''}
+                                        </div>
+                                        ${medida.notas ? `<p style="font-style: italic;">${medida.notas}</p>` : ''}
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    }
+                    
+                    // Renderizar entrenamientos
+                    if (divEntrenamientos && data.entrenamientos) {
+                        if (data.entrenamientos.length === 0) {
+                            divEntrenamientos.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-dumbbell" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay registros de entrenamientos aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divEntrenamientos.innerHTML = data.entrenamientos.map((entrenamiento, index) => {
+                                const esMasReciente = index === 0;
+                                const fechaCorrecta = new Date(entrenamiento.fecha_entrenamiento + 'T00:00:00');
+                                return `
+                                    <div class="card" style="${esMasReciente ? 'border-left: 4px solid #e91e63;' : ''}">
+                                        <h4>🏋️ ${entrenamiento.nombre_rutina || 'Entrenamiento'} ${esMasReciente ? ' 🆕' : ''}</h4>
+                                        <p>📅 ${fechaCorrecta.toLocaleDateString()}</p>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                                            ${entrenamiento.intensidad ? `<span class="badge entrenamiento">💪 ${entrenamiento.intensidad}</span>` : ''}
+                                            ${entrenamiento.duracion_real ? `<span class="badge entrenamiento">⏱️ ${entrenamiento.duracion_real} min</span>` : ''}
+                                            ${entrenamiento.calorias ? `<span class="badge entrenamiento">🔥 ${entrenamiento.calorias} cal</span>` : ''}
+                                            ${entrenamiento.sensacion ? `<span class="badge entrenamiento">😊 ${entrenamiento.sensacion}</span>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    }
+                    
+                    // Mostrar resultado
+                    resultadoDiv.style.display = 'block';
+                    resultadoContenido.innerHTML = `
+                        <p><strong>✅ Historial de progresos cargado exitosamente:</strong></p>
+                        <p><strong>⚖️ Total registros de peso:</strong> ${data.pesos?.length || 0}</p>
+                        <p><strong>📏 Total registros de medidas:</strong> ${data.medidas?.length || 0}</p>
+                        <p><strong>🏋️ Total entrenamientos realizados:</strong> ${data.entrenamientos?.length || 0}</p>
+                        <p><strong>⏰ Última actualización:</strong> ${new Date().toLocaleString()}</p>
+                    `;
+                    
+                    mostrarNotificacion('success', `✅ Historial cargado: ${data.pesos?.length || 0} pesos, ${data.medidas?.length || 0} medidas, ${data.entrenamientos?.length || 0} entrenamientos`);
+                    
+                } else {
+                    resultadoDiv.style.display = 'block';
+                    resultadoContenido.innerHTML = `
+                        <p><strong>❌ Error al cargar historial de progresos:</strong> ${data.message}</p>
+                    `;
+                    
+                    mostrarNotificacion('error', '❌ Error al cargar historial de progresos');
+                }
+            })
+            .catch(error => {
+                console.error('💥 Error en la petición de historial de progresos:', error);
+                
+                const resultadoDiv = document.getElementById('resultado');
+                const resultadoContenido = document.getElementById('resultadoContenido');
+                resultadoDiv.style.display = 'block';
+                resultadoContenido.innerHTML = `
+                    <p><strong>💥 Error de conexión:</strong> ${error.message}</p>
+                `;
+                
+                mostrarNotificacion('error', '💥 Error de conexión');
+            });
+        }
+        
+        // Cargar historial automáticamente al iniciar
+        window.addEventListener('load', function() {
+            setTimeout(cargarHistorialProgresos, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 <?php
 // Incluir archivo de conexión
-include '../PHP/conexión.php';
+include '../conexión.php';
 
 // Verificar que la conexión esté activa
 if (!$conexion) {

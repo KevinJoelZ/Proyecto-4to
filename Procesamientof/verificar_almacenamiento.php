@@ -1,6 +1,6 @@
 <?php
 // Archivo para verificar que los datos se estén guardando en la base de datos
-include '../PHP/conexión.php';
+include '../conexión.php';
 
 echo "<!DOCTYPE html>
 <html lang='es'>

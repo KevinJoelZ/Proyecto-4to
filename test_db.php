@@ -3,7 +3,7 @@
 $host = "localhost";
 $user = "root";
 $password = "";
-$database = "guardar_base_datos";
+$database = "plataforma_fitness";
 
 echo "<h2>Verificación de Base de Datos</h2>";
 
@@ -24,20 +24,20 @@ while ($row = $result->fetch_array(MYSQLI_NUM)) {
 }
 echo "</ul>";
 
-// Verificar si 'guardarbd' existe
-if (in_array("guardar_base_datos", $databases)) {
-    echo "<p style='color: green;'>✅ Base de datos 'guardarbd' existe</p>";
+// Verificar si 'plataforma_fitness' existe
+if (in_array("plataforma_fitness", $databases)) {
+    echo "<p style='color: green;'>✅ Base de datos 'plataforma_fitness' existe</p>";
     
-    // Conectar a 'guardarbd'
+    // Conectar a 'plataforma_fitness'
     $conexion = new mysqli($host, $user, $password, $database);
     if ($conexion->connect_error) {
-        echo "<p style='color: red;'>❌ Error conectando a 'guardarbd': " . $conexion->connect_error . "</p>";
+        echo "<p style='color: red;'>❌ Error conectando a 'plataforma_fitness': " . $conexion->connect_error . "</p>";
     } else {
-        echo "<p style='color: green;'>✅ Conexión a 'guardarbd' exitosa</p>";
+        echo "<p style='color: green;'>✅ Conexión a 'plataforma_fitness' exitosa</p>";
         
         // Listar todas las tablas en la BD
         $tables_result = $conexion->query("SHOW TABLES");
-        echo "<h3>Tablas en 'guardar_base_datos':</h3><ul>";
+        echo "<h3>Tablas en 'plataforma_fitness':</h3><ul>";
         while ($table_row = $tables_result->fetch_array(MYSQLI_NUM)) {
             echo "<li>" . $table_row[0] . "</li>";
         }
@@ -57,7 +57,7 @@ if (in_array("guardar_base_datos", $databases)) {
     }
     $conexion->close();
 } else {
-    echo "<p style='color: red;'>❌ Base de datos 'guardar_base_datos' NO existe. Crea la BD y ejecuta BD/Tablas.sql</p>";
+    echo "<p style='color: red;'>❌ Base de datos 'plataforma_fitness' NO existe. Ejecuta crear_db_guardar.php primero.</p>";
 }
 
 $conn->close();

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rápido - Registro de Progresos</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #1976d2; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #1976d2; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { background: #1565c0; }
+        button.success { background: #4caf50; }
+        button.success:hover { background: #45a049; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 5px; color: white; z-index: 1000; max-width: 350px; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .hidden { display: none; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #1976d2; margin-bottom: 10px; }
+        .header p { color: #666; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; display: none; }
+        .form-section { margin-bottom: 30px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; }
+        .form-section h3 { color: #1976d2; margin-bottom: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Test Rápido - Registro de Progresos</h1>
+            <p>Verifica que los formularios de peso, medidas y entrenamientos funcionen correctamente</p>
+        </div>
+        
+        <div class="form-section">
+            <h3>⚖️ Registrar Peso</h3>
+            <form id="testPesoForm">
+                <input type="hidden" name="form_type" value="peso">
+                <input type="hidden" name="usuario_id" value="demo_user">
+                
+                <div class="form-group">
+                    <label for="peso">Peso Actual (kg):</label>
+                    <input type="number" id="peso" name="peso" value="75.5" min="20" max="300" step="0.1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha_medicion_peso">Fecha de Medición:</label>
+                    <input type="date" id="fecha_medicion_peso" name="fecha_medicion" value="2026-03-27" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notas_peso">Notas:</label>
+                    <textarea id="notas_peso" name="notas" rows="2">Peso registrado después del entrenamiento de piernas</textarea>
+                </div>
+                
+                <button type="submit" class="success">⚖️ Registrar Peso</button>
+            </form>
+        </div>
+        
+        <div class="form-section">
+            <h3>📏 Medidas Corporales</h3>
+            <form id="testMedidasForm">
+                <input type="hidden" name="form_type" value="medidas">
+                <input type="hidden" name="usuario_id" value="demo_user">
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="fecha_medicion_medidas">Fecha de Medición:</label>
+                        <input type="date" id="fecha_medicion_medidas" name="fecha_medicion" value="2026-03-27" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pecho">Pecho (cm):</label>
+                        <input type="number" id="pecho" name="pecho" value="101" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="cintura">Cintura (cm):</label>
+                        <input type="number" id="cintura" name="cintura" value="82.5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="cadera">Cadera (cm):</label>
+                        <input type="number" id="cadera" name="cadera" value="94.8" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="biceps">Bíceps (cm):</label>
+                        <input type="number" id="biceps" name="biceps" value="34.2" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="pierna">Pierna (cm):</label>
+                        <input type="number" id="pierna" name="pierna" value="55.6" step="0.1">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notas_medidas">Notas:</label>
+                    <textarea id="notas_medidas" name="notas" rows="2">Medidas de progreso mensual</textarea>
+                </div>
+                
+                <button type="submit" class="success">📏 Guardar Medidas</button>
+            </form>
+        </div>
+        
+        <div class="form-section">
+            <h3>🏃 Registrar Entrenamiento</h3>
+            <form id="testEntrenamientoForm">
+                <input type="hidden" name="form_type" value="entrenamiento">
+                <input type="hidden" name="usuario_id" value="demo_user">
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="rutina_id">Rutina Realizada:</label>
+                        <select id="rutina_id" name="rutina_id">
+                            <option value="1" selected>Rutina de Piernas - Lunes</option>
+                            <option value="2">Cardio Matutino</option>
+                            <option value="3">Estiramientos y Yoga</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombre_rutina">Nombre de la Rutina:</label>
+                        <input type="text" id="nombre_rutina" name="nombre_rutina" value="Rutina de Piernas - Lunes" required>
+                    </div>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label for="intensidad">Intensidad (1-10):</label>
+                        <input type="range" id="intensidad" name="intensidad" min="1" max="10" value="7" oninput="this.nextElementSibling.textContent = this.value">
+                        <output style="text-align: center; font-weight: 600; color: #1976d2; display: block;">7</output>
+                    </div>
+                    <div class="form-group">
+                        <label for="sensacion">¿Cómo te sentiste?:</label>
+                        <select id="sensacion" name="sensacion" required>
+                            <option value="excelente">🤩 Excelente</option>
+                            <option value="bien" selected>😊 Bien</option>
+                            <option value="regular">😐 Regular</option>
+                            <option value="cansado">😓 Cansado</option>
+                            <option value="agotado">😫 Agotado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duracion_real">Duración Real (min):</label>
+                        <input type="number" id="duracion_real" name="duracion_real" value="58" min="1">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="calorias">Calorías Quemadas:</label>
+                    <input type="number" id="calorias" name="calorias" value="320" min="0">
+                </div>
+                
+                <button type="submit" class="success">🏃 Registrar Entrenamiento</button>
+            </form>
+        </div>
+        
+        <div id="result" class="result">
+            <h3>📊 Resultado del Test:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Test de registro de progresos iniciado');
+            
+            const pesoForm = document.getElementById('testPesoForm');
+            const medidasForm = document.getElementById('testMedidasForm');
+            const entrenamientoForm = document.getElementById('testEntrenamientoForm');
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            
+            // Manejar formulario de peso
+            pesoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('📝 Enviando test de peso...');
+                
+                // Validación
+                const peso = pesoForm.peso.value;
+                const fecha_medicion = pesoForm.fecha_medicion_peso.value;
+                
+                if (!peso || !fecha_medicion) {
+                    showNotification('error', 'Por favor, completa el peso y la fecha de medición.');
+                    return;
+                }
+                
+                // Enviar con AJAX
+                const formData = new FormData(pesoForm);
+                
+                showNotification('success', '⚖️ Registrando peso de prueba...');
+                
+                fetch('Procesamientof/procesar_formularios.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('📥 Respuesta de peso:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📋 Datos de peso procesados:', data);
+                    
+                    // Mostrar resultado
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>✅ Estado Peso:</strong> ${data.success ? 'Éxito' : 'Error'}</p>
+                        <p><strong>📧 Mensaje Peso:</strong> ${data.message}</p>
+                        <p><strong>⏰ Tiempo:</strong> ${new Date().toLocaleTimeString()}</p>
+                        <p><strong>🗃️ Base de datos:</strong> plataforma_fitness</p>
+                        <p><strong>📋 Tabla:</strong> progresos_peso</p>
+                    `;
+                    
+                    if (data.success) {
+                        showNotification('success', data.message);
+                        console.log('✅ Test de peso exitoso');
+                    } else {
+                        showNotification('error', data.message || 'Error desconocido');
+                        console.log('❌ Error en test de peso');
+                    }
+                })
+                .catch(error => {
+                    console.error('💥 Error en test de peso:', error);
+                    showNotification('error', 'Error de conexión: ' + error.message);
+                });
+            });
+            
+            // Manejar formulario de medidas
+            medidasForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('📝 Enviando test de medidas...');
+                
+                // Validación - al menos una medida
+                const pecho = medidasForm.pecho.value;
+                const cintura = medidasForm.cintura.value;
+                const cadera = medidasForm.cadera.value;
+                const biceps = medidasForm.biceps.value;
+                const pierna = medidasForm.pierna.value;
+                
+                if (!pecho && !cintura && !cadera && !biceps && !pierna) {
+                    showNotification('error', 'Debes registrar al menos una medida corporal.');
+                    return;
+                }
+                
+                // Enviar con AJAX
+                const formData = new FormData(medidasForm);
+                
+                showNotification('success', '📏 Registrando medidas de prueba...');
+                
+                fetch('Procesamientof/procesar_formularios.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('📥 Respuesta de medidas:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📋 Datos de medidas procesados:', data);
+                    
+                    // Agregar al resultado existente
+                    const resultadoMedidas = `
+                        <hr style="margin: 15px 0;">
+                        <p><strong>✅ Estado Medidas:</strong> ${data.success ? 'Éxito' : 'Error'}</p>
+                        <p><strong>📧 Mensaje Medidas:</strong> ${data.message}</p>
+                        <p><strong>🗃️ Tabla:</strong> medidas_corporales</p>
+                    `;
+                    resultContent.innerHTML += resultadoMedidas;
+                    
+                    if (data.success) {
+                        showNotification('success', data.message);
+                        console.log('✅ Test de medidas exitoso');
+                    } else {
+                        showNotification('error', data.message || 'Error desconocido');
+                        console.log('❌ Error en test de medidas');
+                    }
+                })
+                .catch(error => {
+                    console.error('💥 Error en test de medidas:', error);
+                    showNotification('error', 'Error de conexión: ' + error.message);
+                });
+            });
+            
+            // Manejar formulario de entrenamiento
+            entrenamientoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('📝 Enviando test de entrenamiento...');
+                
+                // Validación
+                const nombre_rutina = entrenamientoForm.nombre_rutina.value.trim();
+                const sensacion = entrenamientoForm.sensacion.value;
+                
+                if (!nombre_rutina || !sensacion) {
+                    showNotification('error', 'Por favor, completa el nombre de la rutina y cómo te sentiste.');
+                    return;
+                }
+                
+                // Enviar con AJAX
+                const formData = new FormData(entrenamientoForm);
+                
+                showNotification('success', '🏃 Registrando entrenamiento de prueba...');
+                
+                fetch('Procesamientof/procesar_formularios.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('📥 Respuesta de entrenamiento:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📋 Datos de entrenamiento procesados:', data);
+                    
+                    // Agregar al resultado existente
+                    const resultadoEntrenamiento = `
+                        <hr style="margin: 15px 0;">
+                        <p><strong>✅ Estado Entrenamiento:</strong> ${data.success ? 'Éxito' : 'Error'}</p>
+                        <p><strong>📧 Mensaje Entrenamiento:</strong> ${data.message}</p>
+                        <p><strong>🗃️ Tabla:</strong> entrenamientos_realizados</p>
+                    `;
+                    resultContent.innerHTML += resultadoEntrenamiento;
+                    
+                    if (data.success) {
+                        showNotification('success', data.message);
+                        console.log('✅ Test de entrenamiento exitoso');
+                    } else {
+                        showNotification('error', data.message || 'Error desconocido');
+                        console.log('❌ Error en test de entrenamiento');
+                    }
+                })
+                .catch(error => {
+                    console.error('💥 Error en test de entrenamiento:', error);
+                    showNotification('error', 'Error de conexión: ' + error.message);
+                });
+            });
+            
+            function showNotification(type, message) {
+                const notification = document.getElementById('notification');
+                const messageEl = document.getElementById('notification-message');
+                
+                messageEl.textContent = message;
+                notification.className = `notification ${type}`;
+                
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 <?php
 // Archivo para visualizar solicitudes de información en la base de datos
-include '../PHP/conexión.php';
+include '../conexión.php';
 
 // Verificar conexión
 if (!$conexion) {

@@ -166,7 +166,7 @@
     <!-- Formulario funcional para solicitar información de planes -->
     <section id="formulario-planes" style="background: #fff; border-radius: 1.1rem; box-shadow: 0 2px 12px rgba(25,118,210,0.07); max-width: 600px; margin: 3rem auto 2rem auto; padding: calc(2.5rem - 2cm + 1cm) calc(1.5rem + 1cm) 2.5rem calc(1.5rem - 0.5cm + 0.5cm);">
         <h2 style="color: #1976d2; margin-bottom: 1.2rem;">Solicitar Información de Planes</h2>
-        <form action="Procesamientof/procesar_formularios.php" method="POST">
+        <form id="planesForm">
             <input type="hidden" name="form_type" value="planes">
             <input type="hidden" name="plan_elegido" id="plan_elegido" value="">
             <div style="margin-bottom: 1rem;">
@@ -411,6 +411,113 @@
         else if (error) show('error', 'Por favor, completa los campos requeridos del formulario.');
       });
     </script>
+<script>
+// Manejo del formulario con AJAX - Versión mejorada para planes
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Script de planes cargado');
+    
+    const form = document.getElementById('planesForm');
+    
+    if (!form) {
+        console.error('❌ Formulario planesForm no encontrado');
+        return;
+    }
+    
+    console.log('✅ Formulario de planes encontrado');
+    
+    form.addEventListener('submit', function(e) {
+        console.log('📝 Formulario de planes enviado');
+        e.preventDefault();
+        
+        // Validación simple
+        const nombre = form.nombre.value.trim();
+        const email = form.email.value.trim();
+        const telefono = form.telefono.value.trim();
+        const motivo = form.motivo.value.trim();
+        const mensaje = form.mensaje.value.trim();
+        const planElegido = form.plan_elegido.value.trim();
+        
+        console.log('📊 Datos del formulario de planes:', { nombre, email, telefono, motivo, mensaje, planElegido });
+        
+        if (!nombre || !email || !motivo || !mensaje) {
+            console.log('❌ Validación falló - campos vacíos');
+            showNotification('error', 'Por favor, completa todos los campos obligatorios.');
+            return false;
+        }
+        
+        if (!validateEmail(email)) {
+            console.log('❌ Validación falló - email inválido');
+            showNotification('error', 'Por favor, ingresa un correo electrónico válido.');
+            return false;
+        }
+        
+        console.log('✅ Validación exitosa - Enviando datos de planes...');
+        
+        // Enviar con AJAX
+        const formData = new FormData(form);
+        console.log('📤 FormData creado para planes');
+        
+        // Mostrar notificación de carga
+        showNotification('success', 'Enviando tu solicitud de planes...');
+        
+        fetch('Procesamientof/procesar_formularios.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('📥 Respuesta recibida de planes:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('📋 Datos de planes procesados:', data);
+            
+            if (data.success) {
+                showNotification('success', data.message);
+                form.reset(); // Limpiar formulario
+                console.log('✅ Éxito - Formulario de planes limpiado');
+            } else {
+                showNotification('error', data.message || 'Hubo un error al enviar tu solicitud de planes. Inténtalo nuevamente.');
+                console.log('❌ Error del servidor en planes:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('💥 Error en la petición de planes:', error);
+            showNotification('error', 'Hubo un error al enviar tu solicitud de planes. Inténtalo nuevamente.');
+        });
+    });
+    
+    // Función de validación de email
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    
+    // Función global showNotification (por si acaso)
+    window.showNotification = function(type, message) {
+        const notification = document.getElementById('notification');
+        const messageEl = document.getElementById('notification-message');
+        
+        if (!notification || !messageEl) {
+            console.error('❌ Elementos de notificación no encontrados en planes');
+            alert(message); // Fallback
+            return;
+        }
+        
+        console.log('🔔 Mostrando notificación de planes:', type, message);
+        messageEl.textContent = message;
+        notification.className = `notification ${type} show`;
+        
+        setTimeout(() => {
+            notification.classList.add('hidden');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 300);
+        }, 5000);
+    };
+    
+    console.log('🎯 Script de planes completamente cargado');
+});
+</script>
 <script>
     // Acordeón para FAQ (varias abiertas)
     document.addEventListener('DOMContentLoaded', function() {

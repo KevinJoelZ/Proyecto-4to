@@ -148,7 +148,7 @@
     <section id="solicitar-info" style="background: #fff; border-radius: 1.1rem; box-shadow: 0 2px 12px rgba(25,118,210,0.07); max-width: 600px; margin: calc(1rem - 2cm + 1cm) auto 2rem auto; padding: calc(2.5rem - 1cm) calc(1.5rem + 1cm) 2.5rem 1.5rem;">
             <h2 style="color: #1976d2; margin-bottom: 1.2rem;">Solicitar Información</h2>
             <p style="margin-bottom: 1.5rem;">Déjanos tus datos y te contactaremos para resolver tus dudas o ayudarte a inscribirte en el servicio que te interesa.</p>
-                                    <form action="Procesamientof/procesar_formularios.php" method="POST">
+                                    <form id="serviciosForm">
                                         <input type="hidden" name="form_type" value="servicios">
                 <div style="margin-bottom: 1rem;">
                     <label for="nombre" style="display: block; margin-bottom: 0.3rem;">Nombre:</label>
@@ -324,6 +324,112 @@
         }
     
         closeBtn.addEventListener('click', hideNotification);
+    });
+    </script>
+    <script>
+    // Manejo del formulario con AJAX - Versión mejorada
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Script de servicios cargado');
+        
+        const form = document.getElementById('serviciosForm');
+        
+        if (!form) {
+            console.error('❌ Formulario serviciosForm no encontrado');
+            return;
+        }
+        
+        console.log('✅ Formulario encontrado');
+        
+        form.addEventListener('submit', function(e) {
+            console.log('📝 Formulario enviado');
+            e.preventDefault();
+            
+            // Validación simple
+            const nombre = form.nombre.value.trim();
+            const email = form.email.value.trim();
+            const telefono = form.telefono.value.trim();
+            const motivo = form.motivo.value.trim();
+            const mensaje = form.mensaje.value.trim();
+            
+            console.log('📊 Datos del formulario:', { nombre, email, telefono, motivo, mensaje });
+            
+            if (!nombre || !email || !motivo || !mensaje) {
+                console.log('❌ Validación falló - campos vacíos');
+                showNotification('error', 'Por favor, completa todos los campos obligatorios.');
+                return false;
+            }
+            
+            if (!validateEmail(email)) {
+                console.log('❌ Validación falló - email inválido');
+                showNotification('error', 'Por favor, ingresa un correo electrónico válido.');
+                return false;
+            }
+            
+            console.log('✅ Validación exitosa - Enviando datos...');
+            
+            // Enviar con AJAX
+            const formData = new FormData(form);
+            console.log('📤 FormData creado');
+            
+            // Mostrar notificación de carga
+            showNotification('success', 'Enviando tu solicitud...');
+            
+            fetch('Procesamientof/procesar_formularios.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('📥 Respuesta recibida:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📋 Datos procesados:', data);
+                
+                if (data.success) {
+                    showNotification('success', data.message);
+                    form.reset(); // Limpiar formulario
+                    console.log('✅ Éxito - Formulario limpiado');
+                } else {
+                    showNotification('error', data.message || 'Hubo un error al enviar tu solicitud. Inténtalo nuevamente.');
+                    console.log('❌ Error del servidor:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('💥 Error en la petición:', error);
+                showNotification('error', 'Hubo un error al enviar tu solicitud. Inténtalo nuevamente.');
+            });
+        });
+        
+        // Función de validación de email
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // Función global showNotification (por si acaso)
+        window.showNotification = function(type, message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            if (!notification || !messageEl) {
+                console.error('❌ Elementos de notificación no encontrados');
+                alert(message); // Fallback
+                return;
+            }
+            
+            console.log('🔔 Mostrando notificación:', type, message);
+            messageEl.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 300);
+            }, 5000);
+        };
+        
+        console.log('🎯 Script de servicios completamente cargado');
     });
     </script>
     <script src="Scriptsindex/faqs.js"></script>

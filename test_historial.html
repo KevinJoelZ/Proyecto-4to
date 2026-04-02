@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Dashboard de Historial</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #1976d2; }
+        select, input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #1976d2; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { background: #1565c0; }
+        .success { background: #4caf50; }
+        .success:hover { background: #45a049; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 5px; color: white; z-index: 1000; max-width: 350px; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .hidden { display: none; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; }
+        .historial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 20px; }
+        .historial-column h3 { color: #1976d2; margin-bottom: 1rem; }
+        .historial-item { border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fafafa; }
+        .historial-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; }
+        .historial-title { margin: 0; font-size: 1rem; }
+        .historial-date { color: #999; font-size: 0.8rem; }
+        .historial-badges { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+        .badge { background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; }
+        .badge.tipo { background: #e3f2fd; }
+        .badge.dificultad { background: #fff3e0; color: #f57c00; }
+        .badge.duracion { background: #e8f5e9; color: #4caf50; }
+        .badge.series { background: #e8f5e9; }
+        .badge.peso { background: #fff3e0; color: #f57c00; }
+        .badge.descanso { background: #e3f2fd; }
+        .historial-notes { margin: 0.5rem 0 0 0; color: #666; font-size: 0.9rem; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Test - Dashboard de Historial</h1>
+        <p>Este test verifica que el historial de rutinas y ejercicios se muestre correctamente.</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <!-- Formulario de prueba para rutinas -->
+            <div>
+                <h3 style="color: #1976d2; margin-bottom: 1rem;">➕ Agregar Rutina de Prueba</h3>
+                <div class="form-group">
+                    <label>Nombre de la Rutina:</label>
+                    <input type="text" id="nombreRutina" placeholder="Ej: Rutina Test - Fuerza">
+                </div>
+                <div class="form-group">
+                    <label>Tipo:</label>
+                    <select id="tipoRutina">
+                        <option value="fuerza">Fuerza</option>
+                        <option value="cardio">Cardio</option>
+                        <option value="flexibilidad">Flexibilidad</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Dificultad:</label>
+                    <select id="dificultadRutina">
+                        <option value="principiante">Principiante</option>
+                        <option value="intermedio">Intermedio</option>
+                        <option value="avanzado">Avanzado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Duración (minutos):</label>
+                    <input type="number" id="duracionRutina" value="30">
+                </div>
+                <button onclick="agregarRutinaPrueba()" class="success">➕ Agregar Rutina</button>
+            </div>
+            
+            <!-- Formulario de prueba para ejercicios -->
+            <div>
+                <h3 style="color: #4caf50; margin-bottom: 1rem;">➕ Agregar Ejercicio de Prueba</h3>
+                <div class="form-group">
+                    <label>Nombre del Ejercicio:</label>
+                    <input type="text" id="nombreEjercicio" placeholder="Ej: Sentadillas">
+                </div>
+                <div class="form-group">
+                    <label>Series:</label>
+                    <input type="number" id="seriesEjercicio" value="3">
+                </div>
+                <div class="form-group">
+                    <label>Repeticiones:</label>
+                    <input type="number" id="repeticionesEjercicio" value="12">
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg):</label>
+                    <input type="number" id="pesoEjercicio" value="20" step="0.5">
+                </div>
+                <button onclick="agregarEjercicioPrueba()" class="success">➕ Agregar Ejercicio</button>
+            </div>
+        </div>
+        
+        <button onclick="cargarHistorial()" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+            🔄 Cargar Historial Completo
+        </button>
+        
+        <!-- Dashboard de Historial -->
+        <div class="historial-grid">
+            <div class="historial-column">
+                <h3>💪 Rutinas Creadas</h3>
+                <div id="historialRutinas">
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de rutinas...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="historial-column">
+                <h3>🏋️ Ejercicios Agregados</h3>
+                <div id="historialEjercicios">
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de ejercicios...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>📊 Resultado:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <script>
+        function mostrarNotificacion(type, message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function agregarRutinaPrueba() {
+            const formData = new FormData();
+            formData.append('form_type', 'rutina');
+            formData.append('usuario_id', 'demo_user');
+            formData.append('nombre', document.getElementById('nombreRutina').value + ' - ' + new Date().toLocaleTimeString());
+            formData.append('tipo', document.getElementById('tipoRutina').value);
+            formData.append('dificultad', document.getElementById('dificultadRutina').value);
+            formData.append('duracion', document.getElementById('duracionRutina').value);
+            formData.append('notas', 'Rutina agregada desde el test de historial');
+            
+            fetch('Procesamientof/procesar_formularios.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarNotificacion('success', '✅ Rutina agregada correctamente');
+                    // Limpiar formulario
+                    document.getElementById('nombreRutina').value = '';
+                    // Recargar historial automáticamente
+                    setTimeout(cargarHistorial, 1000);
+                } else {
+                    mostrarNotificacion('error', '❌ Error al agregar rutina');
+                }
+            })
+            .catch(error => {
+                mostrarNotificacion('error', '💥 Error de conexión');
+            });
+        }
+        
+        function agregarEjercicioPrueba() {
+            const formData = new FormData();
+            formData.append('form_type', 'ejercicio');
+            formData.append('usuario_id', 'demo_user');
+            formData.append('rutina_id', '1'); // ID de rutina de prueba
+            formData.append('nombre', document.getElementById('nombreEjercicio').value + ' - ' + new Date().toLocaleTimeString());
+            formData.append('series', document.getElementById('seriesEjercicio').value);
+            formData.append('repeticiones', document.getElementById('repeticionesEjercicio').value);
+            formData.append('peso', document.getElementById('pesoEjercicio').value);
+            formData.append('descanso', '60');
+            
+            fetch('Procesamientof/procesar_formularios.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarNotificacion('success', '✅ Ejercicio agregado correctamente');
+                    // Limpiar formulario
+                    document.getElementById('nombreEjercicio').value = '';
+                    // Recargar historial automáticamente
+                    setTimeout(cargarHistorial, 1000);
+                } else {
+                    mostrarNotificacion('error', '❌ Error al agregar ejercicio');
+                }
+            })
+            .catch(error => {
+                mostrarNotificacion('error', '💥 Error de conexión');
+            });
+        }
+        
+        function cargarHistorial() {
+            console.log('🔄 Cargando historial completo...');
+            
+            // Mostrar estados de carga
+            const divRutinas = document.getElementById('historialRutinas');
+            const divEjercicios = document.getElementById('historialEjercicios');
+            
+            if (divRutinas) {
+                divRutinas.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de rutinas...</p>
+                    </div>
+                `;
+            }
+            
+            if (divEjercicios) {
+                divEjercicios.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de ejercicios...</p>
+                    </div>
+                `;
+            }
+            
+            fetch('Procesamientof/cargar_historial.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'cargar_historial', usuario_id: 'demo_user' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Historial completo:', data);
+                
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('resultContent');
+                
+                if (data.success) {
+                    // Renderizar rutinas
+                    if (divRutinas && data.rutinas) {
+                        if (data.rutinas.length === 0) {
+                            divRutinas.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-dumbbell" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay rutinas creadas aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divRutinas.innerHTML = data.rutinas.map(rutina => {
+                                const tipoIcons = {
+                                    'fuerza': '💪',
+                                    'cardio': '🏃',
+                                    'flexibilidad': '🧘',
+                                    'tecnica': '🎯',
+                                    'resistencia': '🔥'
+                                };
+                                const dificultadIcons = {
+                                    'principiante': '🌱',
+                                    'intermedio': '🌿',
+                                    'avanzado': '🌳'
+                                };
+                                
+                                return `
+                                    <div class="historial-item">
+                                        <div class="historial-header">
+                                            <h5 class="historial-title" style="color: #1976d2;">
+                                                ${tipoIcons[rutina.tipo] || '🏋️'} ${rutina.nombre}
+                                            </h5>
+                                            <span class="historial-date">
+                                                ${new Date(rutina.fecha_creacion).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        <div class="historial-badges">
+                                            <span class="badge tipo">${rutina.tipo}</span>
+                                            <span class="badge dificultad">${dificultadIcons[rutina.dificultad] || '📊'} ${rutina.dificultad}</span>
+                                            <span class="badge duracion">⏱️ ${rutina.duracion}min</span>
+                                        </div>
+                                        ${rutina.notas ? `<p class="historial-notes">${rutina.notas}</p>` : ''}
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    }
+                    
+                    // Renderizar ejercicios
+                    if (divEjercicios && data.ejercicios) {
+                        if (data.ejercicios.length === 0) {
+                            divEjercicios.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-running" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay ejercicios agregados aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divEjercicios.innerHTML = data.ejercicios.map(ejercicio => `
+                                <div class="historial-item">
+                                    <div class="historial-header">
+                                        <h5 class="historial-title" style="color: #4caf50;">
+                                            🏋️ ${ejercicio.nombre}
+                                        </h5>
+                                        <span class="historial-date">
+                                            ${new Date(ejercicio.fecha_creacion).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                    <div class="historial-badges">
+                                        <span class="badge series">🏋️ ${ejercicio.series} series</span>
+                                        <span class="badge series">🔄 ${ejercicio.repeticiones} reps</span>
+                                        ${ejercicio.peso ? `
+                                            <span class="badge peso">🏋️ ${ejercicio.peso}kg</span>
+                                        ` : ''}
+                                        <span class="badge descanso">⏱️ ${ejercicio.descanso}s descanso</span>
+                                    </div>
+                                    ${ejercicio.nombre_rutina ? `
+                                        <p class="historial-notes">
+                                            <strong>Rutina:</strong> ${ejercicio.nombre_rutina}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            `).join('');
+                        }
+                    }
+                    
+                    // Mostrar resultado
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>✅ Historial cargado exitosamente:</strong></p>
+                        <p><strong>📊 Total rutinas:</strong> ${data.rutinas?.length || 0}</p>
+                        <p><strong>🏋️ Total ejercicios:</strong> ${data.ejercicios?.length || 0}</p>
+                        <p><strong>⏰ Última actualización:</strong> ${new Date().toLocaleString()}</p>
+                    `;
+                    
+                    mostrarNotificacion('success', `✅ Historial cargado: ${data.rutinas?.length || 0} rutinas, ${data.ejercicios?.length || 0} ejercicios`);
+                    
+                } else {
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>❌ Error al cargar historial:</strong> ${data.message}</p>
+                    `;
+                    
+                    mostrarNotificacion('error', '❌ Error al cargar historial');
+                }
+            })
+            .catch(error => {
+                console.error('💥 Error en la petición de historial:', error);
+                
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('resultContent');
+                resultDiv.style.display = 'block';
+                resultContent.innerHTML = `
+                    <p><strong>💥 Error de conexión:</strong> ${error.message}</p>
+                `;
+                
+                mostrarNotificacion('error', '💥 Error de conexión');
+            });
+        }
+        
+        // Cargar historial automáticamente al iniciar
+        window.addEventListener('load', function() {
+            setTimeout(cargarHistorial, 1000);
+        });
+    </script>
+</body>
+</html>

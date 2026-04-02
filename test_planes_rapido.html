@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Rápido - Formulario Planes</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #1976d2; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #1976d2; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #1565c0; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 5px; color: white; z-index: 1000; max-width: 350px; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .hidden { display: none; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #1976d2; margin-bottom: 10px; }
+        .header p { color: #666; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; display: none; }
+        .plan-info { background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Test Rápido - Formulario de Planes</h1>
+            <p>Verifica que el formulario de planes funcione correctamente</p>
+        </div>
+        
+        <div class="plan-info">
+            <strong>💡 Nota:</strong> Este test simula la selección del plan "Personalizado" ($35/mes)
+        </div>
+        
+        <form id="testForm">
+            <input type="hidden" name="form_type" value="planes">
+            <input type="hidden" name="plan_elegido" id="plan_elegido" value="Personalizado">
+            
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required value="Usuario Test Planes">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" required value="planes@test.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" value="0995555555">
+            </div>
+            
+            <div class="form-group">
+                <label for="motivo">Motivo de contacto:</label>
+                <select id="motivo" name="motivo" required>
+                    <option value="planes" selected>Información sobre planes</option>
+                    <option value="informacion">Solicitar información</option>
+                    <option value="soporte">Soporte técnico</option>
+                    <option value="otros">Otros</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="mensaje">Mensaje:</label>
+                <textarea id="mensaje" name="mensaje" rows="3" required>Estoy interesado en el plan Personalizado. Quiero más información sobre los beneficios y cómo comenzar.</textarea>
+            </div>
+            
+            <button type="submit">🚀 Enviar Test de Planes</button>
+        </form>
+        
+        <div id="result" class="result">
+            <h3>📊 Resultado del Test:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Test de planes iniciado');
+            
+            const form = document.getElementById('testForm');
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('📝 Enviando test de planes...');
+                
+                // Validación
+                const nombre = form.nombre.value.trim();
+                const email = form.email.value.trim();
+                const motivo = form.motivo.value.trim();
+                const mensaje = form.mensaje.value.trim();
+                const planElegido = form.plan_elegido.value.trim();
+                
+                if (!nombre || !email || !motivo || !mensaje) {
+                    showNotification('error', 'Por favor, completa todos los campos obligatorios.');
+                    return;
+                }
+                
+                // Enviar con AJAX
+                const formData = new FormData(form);
+                
+                showNotification('success', '💰 Enviando solicitud de planes...');
+                
+                fetch('Procesamientof/procesar_formularios.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('📥 Respuesta de planes:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📋 Datos de planes procesados:', data);
+                    
+                    // Mostrar resultado
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>✅ Estado:</strong> ${data.success ? 'Éxito' : 'Error'}</p>
+                        <p><strong>📧 Mensaje:</strong> ${data.message}</p>
+                        <p><strong>⏰ Tiempo:</strong> ${new Date().toLocaleTimeString()}</p>
+                        <p><strong>🗃️ Base de datos:</strong> plataforma_fitness</p>
+                        <p><strong>📋 Tabla:</strong> solicitudes_planes</p>
+                        <p><strong>💎 Plan elegido:</strong> ${planElegido}</p>
+                    `;
+                    
+                    if (data.success) {
+                        showNotification('success', data.message);
+                        console.log('✅ Test de planes exitoso');
+                    } else {
+                        showNotification('error', data.message || 'Error desconocido');
+                        console.log('❌ Error en test de planes');
+                    }
+                })
+                .catch(error => {
+                    console.error('💥 Error en test de planes:', error);
+                    showNotification('error', 'Error de conexión: ' + error.message);
+                    
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>❌ Estado:</strong> Error de conexión</p>
+                        <p><strong>💥 Error:</strong> ${error.message}</p>
+                        <p><strong>🔧 Verifica:</strong></p>
+                        <ul>
+                            <li>Que XAMPP esté corriendo</li>
+                            <li>Que la base de datos plataforma_fitness exista</li>
+                            <li>Que el archivo procesar_formularios.php exista</li>
+                            <li>Que la tabla solicitudes_planes exista</li>
+                        </ul>
+                    `;
+                });
+            });
+            
+            function showNotification(type, message) {
+                const notification = document.getElementById('notification');
+                const messageEl = document.getElementById('notification-message');
+                
+                messageEl.textContent = message;
+                notification.className = `notification ${type}`;
+                
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

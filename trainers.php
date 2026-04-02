@@ -159,7 +159,7 @@
                 <!-- Formulario para contactar entrenadores y guardar en la base de datos -->
                 <section id="formulario-entrenadores" style="background: #fff; border-radius: 1.1rem; box-shadow: 0 2px 12px rgba(25,118,210,0.07); max-width: 600px; margin: 3rem auto 2rem auto; padding: calc(2.5rem - 2cm + 1cm) calc(1.5rem + 1cm) 2.5rem calc(1.5rem - 0.5cm + 0.5cm);">
                     <h2 style="color: #1976d2; margin-bottom: 1.2rem;">Contactar Entrenador</h2>
-                                            <form action="Procesamientof/procesar_formularios.php" method="POST">
+                                            <form id="entrenadoresForm">
                                                 <input type="hidden" name="form_type" value="entrenadores">
                         <div style="margin-bottom: 1rem;">
                             <label for="nombre" style="display: block; margin-bottom: 0.3rem;">Nombre:</label>
@@ -344,5 +344,112 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     closeBtn.addEventListener('click', hideNotification);
+});
+</script>
+
+<script>
+// Manejo del formulario con AJAX - Versión mejorada para entrenadores
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Script de entrenadores cargado');
+    
+    const form = document.getElementById('entrenadoresForm');
+    
+    if (!form) {
+        console.error('❌ Formulario entrenadoresForm no encontrado');
+        return;
+    }
+    
+    console.log('✅ Formulario de entrenadores encontrado');
+    
+    form.addEventListener('submit', function(e) {
+        console.log('📝 Formulario de entrenadores enviado');
+        e.preventDefault();
+        
+        // Validación simple
+        const nombre = form.nombre.value.trim();
+        const email = form.email.value.trim();
+        const telefono = form.telefono.value.trim();
+        const motivo = form.motivo.value.trim();
+        const mensaje = form.mensaje.value.trim();
+        
+        console.log('📊 Datos del formulario de entrenadores:', { nombre, email, telefono, motivo, mensaje });
+        
+        if (!nombre || !email || !motivo || !mensaje) {
+            console.log('❌ Validación falló - campos vacíos');
+            showNotification('error', 'Por favor, completa todos los campos obligatorios.');
+            return false;
+        }
+        
+        if (!validateEmail(email)) {
+            console.log('❌ Validación falló - email inválido');
+            showNotification('error', 'Por favor, ingresa un correo electrónico válido.');
+            return false;
+        }
+        
+        console.log('✅ Validación exitosa - Enviando datos de entrenador...');
+        
+        // Enviar con AJAX
+        const formData = new FormData(form);
+        console.log('📤 FormData creado para entrenadores');
+        
+        // Mostrar notificación de carga
+        showNotification('success', 'Enviando tu solicitud de entrenador...');
+        
+        fetch('Procesamientof/procesar_formularios.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('📥 Respuesta recibida de entrenadores:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('📋 Datos de entrenadores procesados:', data);
+            
+            if (data.success) {
+                showNotification('success', data.message);
+                form.reset(); // Limpiar formulario
+                console.log('✅ Éxito - Formulario de entrenadores limpiado');
+            } else {
+                showNotification('error', data.message || 'Hubo un error al enviar tu solicitud de entrenador. Inténtalo nuevamente.');
+                console.log('❌ Error del servidor en entrenadores:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('💥 Error en la petición de entrenadores:', error);
+            showNotification('error', 'Hubo un error al enviar tu solicitud de entrenador. Inténtalo nuevamente.');
+        });
+    });
+    
+    // Función de validación de email
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    
+    // Función global showNotification (por si acaso)
+    window.showNotification = function(type, message) {
+        const notification = document.getElementById('notification');
+        const messageEl = document.getElementById('notification-message');
+        
+        if (!notification || !messageEl) {
+            console.error('❌ Elementos de notificación no encontrados en entrenadores');
+            alert(message); // Fallback
+            return;
+        }
+        
+        console.log('🔔 Mostrando notificación de entrenadores:', type, message);
+        messageEl.textContent = message;
+        notification.className = `notification ${type} show`;
+        
+        setTimeout(() => {
+            notification.classList.add('hidden');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 300);
+        }, 5000);
+    };
+    
+    console.log('🎯 Script de entrenadores completamente cargado');
 });
 </script>

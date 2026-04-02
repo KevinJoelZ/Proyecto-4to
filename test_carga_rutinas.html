@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Carga de Rutinas</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #1976d2; }
+        select, input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #1976d2; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { background: #1565c0; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 5px; color: white; z-index: 1000; max-width: 350px; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .hidden { display: none; }
+        .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏋️ Test - Carga de Rutinas en Select</h1>
+        <p>Este test verifica que las rutinas se carguen dinámicamente desde la base de datos.</p>
+        
+        <div class="form-group">
+            <label for="selectEjercicio">Seleccionar Rutina para Ejercicio:</label>
+            <select id="selectEjercicio">
+                <option value="">Cargando rutinas...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="selectEntrenamiento">Seleccionar Rutina para Entrenamiento:</label>
+            <select id="selectEntrenamiento">
+                <option value="">Cargando rutinas...</option>
+            </select>
+        </div>
+        
+        <button onclick="cargarRutinas()">🔄 Cargar Rutinas desde BD</button>
+        <button onclick="agregarRutinaPrueba()">➕ Agregar Rutina de Prueba</button>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>📊 Resultado:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Notificación -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+
+    <script>
+        function mostrarNotificacion(type, message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function cargarRutinas() {
+            console.log('🔄 Iniciando carga de rutinas...');
+            
+            fetch('Procesamientof/cargar_rutinas.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'cargar_rutinas', usuario_id: 'demo_user' })
+            })
+            .then(response => {
+                console.log('📥 Respuesta del servidor:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📋 Datos recibidos:', data);
+                
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('resultContent');
+                
+                if (data.success && data.rutinas) {
+                    // Actualizar ambos selects
+                    const selectEjercicio = document.getElementById('selectEjercicio');
+                    const selectEntrenamiento = document.getElementById('selectEntrenamiento');
+                    
+                    // Limpiar selects
+                    selectEjercicio.innerHTML = '<option value="">Selecciona una rutina</option>';
+                    selectEntrenamiento.innerHTML = '<option value="">Selecciona una rutina</option>';
+                    
+                    // Agregar rutinas
+                    data.rutinas.forEach(rutina => {
+                        const option1 = document.createElement('option');
+                        option1.value = rutina.id;
+                        option1.textContent = `${rutina.nombre} (${rutina.tipo})`;
+                        selectEjercicio.appendChild(option1);
+                        
+                        const option2 = document.createElement('option');
+                        option2.value = rutina.id;
+                        option2.textContent = `${rutina.nombre} (${rutina.tipo})`;
+                        selectEntrenamiento.appendChild(option2);
+                    });
+                    
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>✅ Éxito:</strong> ${data.rutinas.length} rutinas cargadas</p>
+                        <p><strong>📋 Rutinas:</strong></p>
+                        <ul>
+                            ${data.rutinas.map(r => `<li><strong>${r.nombre}</strong> - ${r.tipo} - ${r.dificultad}</li>`).join('')}
+                        </ul>
+                    `;
+                    
+                    mostrarNotificacion('success', `✅ ${data.rutinas.length} rutinas cargadas correctamente`);
+                    
+                } else {
+                    resultDiv.style.display = 'block';
+                    resultContent.innerHTML = `
+                        <p><strong>❌ Error:</strong> ${data.message || 'Error desconocido'}</p>
+                    `;
+                    
+                    mostrarNotificacion('error', '❌ Error al cargar rutinas');
+                }
+            })
+            .catch(error => {
+                console.error('💥 Error en la petición:', error);
+                
+                const resultDiv = document.getElementById('result');
+                const resultContent = document.getElementById('resultContent');
+                resultDiv.style.display = 'block';
+                resultContent.innerHTML = `
+                    <p><strong>💥 Error de conexión:</strong> ${error.message}</p>
+                `;
+                
+                mostrarNotificacion('error', '💥 Error de conexión');
+            });
+        }
+        
+        function agregarRutinaPrueba() {
+            console.log('➕ Agregando rutina de prueba...');
+            
+            const formData = new FormData();
+            formData.append('form_type', 'rutina');
+            formData.append('usuario_id', 'demo_user');
+            formData.append('nombre', 'Rutina de Prueba - ' + new Date().toLocaleTimeString());
+            formData.append('tipo', 'fuerza');
+            formData.append('dificultad', 'principiante');
+            formData.append('duracion', '45');
+            formData.append('notas', 'Rutina agregada para prueba');
+            
+            fetch('Procesamientof/procesar_formularios.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarNotificacion('success', '✅ Rutina de prueba agregada');
+                    // Recargar rutinas automáticamente
+                    setTimeout(cargarRutinas, 1000);
+                } else {
+                    mostrarNotificacion('error', '❌ Error al agregar rutina de prueba');
+                }
+            })
+            .catch(error => {
+                mostrarNotificacion('error', '💥 Error al agregar rutina de prueba');
+            });
+        }
+        
+        // Cargar rutinas automáticamente al iniciar
+        window.addEventListener('load', function() {
+            setTimeout(cargarRutinas, 500);
+        });
+    </script>
+</body>
+</html>

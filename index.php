@@ -84,7 +84,7 @@
         <div id="error" class="message error" style="display: none;"></div>
 
         <div class="footer">
-            <p> 2025 DeporteFit. Todos los derechos reservados.</p>
+            <p>&copy; <?php echo date('Y'); ?> DeporteFit. Todos los derechos reservados.</p>
         </div>
     </div>
 

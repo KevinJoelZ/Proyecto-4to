@@ -16,7 +16,7 @@
             <img src="imagenes/formulario.png" alt="Formulario de Contacto" style="height: 140px; object-fit: cover; border-radius: 12px 12px 0 0;">
             <div class="servicio-info" style="padding: 1.5rem 1.2rem; text-align: center;">
                 <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: #1976d2;">Formulario de Contacto</h3>
-                <form class="form-contacto" action="Procesamientof/procesar_formularios.php" method="POST" style="padding: 0; max-width: 100%;">
+                <form class="form-contacto" id="contactoForm" style="padding: 0; max-width: 100%;">
                     <input type="hidden" name="form_type" value="contacto">
                     <div style="margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center;">
                         <label for="nombre" style="display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 600; color: #333; margin-bottom: 0.5rem; width: 100%; justify-content: flex-start;"><i class="fas fa-user" style="color: #4fc3f7;"></i>Nombre:</label>
@@ -146,9 +146,37 @@
             </div>
         </section>
         <script>
-        // Validación del formulario antes del envío y efectos de foco
+        // Función global para mostrar notificaciones
+        function showNotification(type, message) {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            if (!notification || !messageEl) return;
+            messageEl.textContent = message;
+            notification.className = `notification ${type} show`;
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+            notification.classList.add('hidden');
+            setTimeout(() => {
+                notification.classList.remove('show');
+                // Limpiar URL
+                if (window.history.replaceState) {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('success');
+                    url.searchParams.delete('error');
+                    window.history.replaceState({}, document.title, url.pathname);
+                }
+            }, 300);
+        }
+
+        // Manejo del formulario con AJAX
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('.form-contacto');
+            const form = document.getElementById('contactoForm');
             const inputs = form.querySelectorAll('input, select, textarea');
             
             // Efectos de foco en inputs
@@ -163,30 +191,55 @@
                 });
             });
             
-            const exito = document.querySelector('.mensaje-exito');
-            const error = document.querySelector('.mensaje-error');
-            
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    // Validación simple: todos los campos requeridos
-                    const nombre = form.nombre.value.trim();
-                    const email = form.email.value.trim();
-                    const telefono = form.telefono.value.trim();
-                    const motivo = form.motivo.value.trim();
-                    const mensaje = form.mensaje.value.trim();
-                    const privacidad = form.privacidad.checked;
-                    
-                    if (!nombre || !email || !telefono || !motivo || !mensaje || !privacidad) {
-                        e.preventDefault();
-                        if (exito) exito.style.display = 'none';
-                        if (error) error.style.display = 'block';
-                        return false;
+            // Manejo del envío con AJAX
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validación simple
+                const nombre = form.nombre.value.trim();
+                const email = form.email.value.trim();
+                const telefono = form.telefono.value.trim();
+                const motivo = form.motivo.value.trim();
+                const mensaje = form.mensaje.value.trim();
+                const privacidad = form.privacidad.checked;
+                
+                if (!nombre || !email || !telefono || !motivo || !mensaje || !privacidad) {
+                    showNotification('error', 'Por favor, completa todos los campos obligatorios y acepta la política de privacidad.');
+                    return false;
+                }
+                
+                if (!validateEmail(email)) {
+                    showNotification('error', 'Por favor, ingresa un correo electrónico válido.');
+                    return false;
+                }
+                
+                // Enviar con AJAX
+                const formData = new FormData(form);
+                formData.append('form_type', 'contacto');
+                
+                fetch('Procesamientof/procesar_formularios.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('success', '¡Éxito! Tu mensaje de contacto ha sido enviado. Te contactaremos pronto.');
+                        form.reset(); // Limpiar formulario
+                    } else {
+                        showNotification('error', data.message || 'Hubo un error al enviar el mensaje. Inténtalo nuevamente.');
                     }
-                    
-                    // Si todo está bien, permitir el envío
-                    if (exito) exito.style.display = 'none';
-                    if (error) error.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('error', 'Hubo un error al enviar el mensaje. Inténtalo nuevamente.');
                 });
+            });
+            
+            // Función de validación de email
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
             }
         });
         </script>
@@ -298,36 +351,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Manejo de notificaciones
+    // Manejo de notificaciones desde URL
     const urlParams = new URLSearchParams(window.location.search);
     const success = urlParams.get('success');
     const error = urlParams.get('error');
-    const notification = document.getElementById('notification');
-    const messageEl = document.getElementById('notification-message');
     const closeBtn = document.getElementById('close-notification');
-
-    function showNotification(type, message) {
-        if (!notification || !messageEl) return;
-        messageEl.textContent = message;
-        notification.className = `notification ${type} show`;
-        setTimeout(() => {
-            hideNotification();
-        }, 5000);
-    }
-
-    function hideNotification() {
-        notification.classList.add('hidden');
-        setTimeout(() => {
-            notification.classList.remove('show');
-            // Limpiar URL
-            if (window.history.replaceState) {
-                const url = new URL(window.location);
-                url.searchParams.delete('success');
-                url.searchParams.delete('error');
-                window.history.replaceState({}, document.title, url.pathname);
-            }
-        }, 300);
-    }
 
     if (success) {
         showNotification('success', '¡Éxito! Tu mensaje de contacto ha sido enviado. Te contactaremos pronto.');
@@ -335,6 +363,8 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification('error', 'Por favor, completa todos los campos obligatorios y verifica que tu email sea válido.');
     }
 
-    closeBtn.addEventListener('click', hideNotification);
+    if (closeBtn) {
+        closeBtn.addEventListener('click', hideNotification);
+    }
 });
 </script>

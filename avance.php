@@ -11,7 +11,46 @@
 </head>
 <body style="background: linear-gradient(180deg, #f7fbff 0%, #e3f0ff 100%); min-height: 100vh;">
     <!-- Header -->
-<?php include_once __DIR__ . '/template/headercliente.php'; ?>
+    <?php include_once __DIR__ . '/template/headercliente.php'; ?>
+
+    <!-- Notificación Toast -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+        <button id="close-notification" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: inherit; padding: 0 0.5rem; float: right;">&times;</button>
+    </div>
+
+    <style>
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        min-width: 300px;
+        max-width: 400px;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        font-family: Arial, sans-serif;
+    }
+    .notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    .notification.hidden {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    .notification.success {
+        background: #4caf50;
+        color: white;
+    }
+    .notification.error {
+        background: #f44336;
+        color: white;
+    }
+    </style>
 
     <!-- Contenido Principal -->
     <div class="av-wrapper">
@@ -48,14 +87,16 @@
                     </div>
                     
                     <form id="formNuevaRutina">
+                        <input type="hidden" name="form_type" value="rutina">
+                        <input type="hidden" name="usuario_id" value="demo_user">
                         <div class="av-form-group">
                             <label class="av-form-label">Nombre de la Rutina</label>
-                            <input type="text" class="av-form-input" id="nombreRutina" placeholder="Ej: Rutina de Piernas - Lunes" required>
+                            <input type="text" class="av-form-input" name="nombre" placeholder="Ej: Rutina de Piernas - Lunes" required>
                         </div>
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Tipo de Entrenamiento</label>
-                            <select class="av-form-select" id="tipoRutina" required>
+                            <select class="av-form-select" name="tipo" required>
                                 <option value="">Selecciona el tipo</option>
                                 <option value="fuerza">💪 Fuerza</option>
                                 <option value="cardio">🏃 Cardio</option>
@@ -67,7 +108,7 @@
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Dificultad</label>
-                            <select class="av-form-select" id="dificultadRutina" required>
+                            <select class="av-form-select" name="dificultad" required>
                                 <option value="">Selecciona nivel</option>
                                 <option value="principiante">🌱 Principiante</option>
                                 <option value="intermedio">🌿 Intermedio</option>
@@ -77,12 +118,12 @@
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Duración (minutos)</label>
-                            <input type="number" class="av-form-input" id="duracionRutina" placeholder="60" min="15" max="180" required>
+                            <input type="number" class="av-form-input" name="duracion" placeholder="60" min="15" max="180" required>
                         </div>
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Notas Adicionales</label>
-                            <textarea class="av-form-textarea" id="notasRutina" placeholder="Comentarios adicionales sobre la rutina..."></textarea>
+                            <textarea class="av-form-textarea" name="notas" placeholder="Comentarios adicionales sobre la rutina..."></textarea>
                         </div>
                         
                         <button type="submit" class="av-btn av-btn-primary" style="width: 100%;">
@@ -99,22 +140,23 @@
                     </div>
                     
                     <form id="formEjercicio">
+                        <input type="hidden" name="form_type" value="ejercicio">
                         <div class="av-form-group">
                             <label class="av-form-label">Rutina</label>
-                            <select class="av-form-select" id="rutinaEjercicio" required>
+                            <select class="av-form-select" name="rutina_id" required>
                                 <option value="">Selecciona una rutina</option>
                             </select>
                         </div>
 
                         <div class="av-form-group">
                             <label class="av-form-label">Ejercicio</label>
-                            <input type="text" class="av-form-input" id="nombreEjercicio" placeholder="Ej: Sentadillas" required>
+                            <input type="text" class="av-form-input" name="nombre" placeholder="Ej: Sentadillas" required>
                         </div>
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Serie</label>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                <input type="number" class="av-form-input" id="seriesEjercicio" placeholder="3" min="1" max="10" required style="flex: 1;">
+                                <input type="number" class="av-form-input" name="series" placeholder="3" min="1" max="10" required style="flex: 1;">
                                 <span style="color: #6b7280;">series</span>
                             </div>
                         </div>
@@ -122,19 +164,19 @@
                         <div class="av-form-group">
                             <label class="av-form-label">Repeticiones</label>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                <input type="number" class="av-form-input" id="repeticionesEjercicio" placeholder="12" min="1" max="100" required style="flex: 1;">
+                                <input type="number" class="av-form-input" name="repeticiones" placeholder="12" min="1" max="100" required style="flex: 1;">
                                 <span style="color: #6b7280;">rep</span>
                             </div>
                         </div>
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Peso (kg)</label>
-                            <input type="number" class="av-form-input" id="pesoEjercicio" placeholder="20" min="0" step="0.5">
+                            <input type="number" class="av-form-input" name="peso" placeholder="20" min="0" step="0.5">
                         </div>
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Descanso entre series</label>
-                            <select class="av-form-select" id="descansoEjercicio">
+                            <select class="av-form-select" name="descanso">
                                 <option value="30">30 segundos</option>
                                 <option value="60" selected>60 segundos</option>
                                 <option value="90">90 segundos</option>
@@ -148,67 +190,45 @@
                     </form>
                 </div>
 
-                <!-- Card: Rutinas Recientes -->
+                <!-- Dashboard de Historial -->
                 <div class="av-card" style="grid-column: 1 / -1;">
                     <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-history"></i> Rutinas Creadas</h3>
-                        <div class="av-card-icon orange"><i class="fas fa-list"></i></div>
+                        <h3 class="av-card-title"><i class="fas fa-history"></i> Historial de Rutinas y Ejercicios</h3>
+                        <div class="av-card-icon blue"><i class="fas fa-list-alt"></i></div>
                     </div>
                     
-                    <div class="av-table-container">
-                        <table class="av-table" id="tablaRutinas">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-tag"></i> Nombre</th>
-                                    <th><i class="fas fa-bolt"></i> Tipo</th>
-                                    <th><i class="fas fa-signal"></i> Dificultad</th>
-                                    <th><i class="fas fa-clock"></i> Duración</th>
-                                    <th><i class="fas fa-calendar"></i> Fecha</th>
-                                    <th><i class="fas fa-cogs"></i> Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cuerpoTablaRutinas">
-                                <tr>
-                                    <td><strong>Rutina de Piernas - Lunes</strong></td>
-                                    <td><span class="av-badge av-badge-info">💪 Fuerza</span></td>
-                                    <td><span class="av-badge av-badge-warning">🌿 Intermedio</span></td>
-                                    <td><i class="fas fa-stopwatch"></i> 60 min</td>
-                                    <td>22/03/2026</td>
-                                    <td>
-                                        <button class="av-btn-icon edit" title="Editar"><i class="fas fa-edit"></i></button>
-                                        <button class="av-btn-icon delete" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Cardio Matutino</strong></td>
-                                    <td><span class="av-badge av-badge-info">🏃 Cardio</span></td>
-                                    <td><span class="av-badge av-badge-success">🌱 Principiante</span></td>
-                                    <td><i class="fas fa-stopwatch"></i> 30 min</td>
-                                    <td>21/03/2026</td>
-                                    <td>
-                                        <button class="av-btn-icon edit" title="Editar"><i class="fas fa-edit"></i></button>
-                                        <button class="av-btn-icon delete" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Estiramientos y Yoga</strong></td>
-                                    <td><span class="av-badge av-badge-info">🧘 Flexibilidad</span></td>
-                                    <td><span class="av-badge av-badge-success">🌱 Principiante</span></td>
-                                    <td><i class="fas fa-stopwatch"></i> 45 min</td>
-                                    <td>20/03/2026</td>
-                                    <td>
-                                        <button class="av-btn-icon edit" title="Editar"><i class="fas fa-edit"></i></button>
-                                        <button class="av-btn-icon delete" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <!-- Columna de Rutinas -->
+                        <div>
+                            <h4 style="color: #1976d2; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-dumbbell"></i> Rutinas Creadas
+                            </h4>
+                            <div id="historialRutinas" style="max-height: 400px; overflow-y: auto;">
+                                <div style="text-align: center; padding: 2rem; color: #666;">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                                    <p>Cargando historial de rutinas...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Columna de Ejercicios -->
+                        <div>
+                            <h4 style="color: #4caf50; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-running"></i> Ejercicios Agregados
+                            </h4>
+                            <div id="historialEjercicios" style="max-height: 400px; overflow-y: auto;">
+                                <div style="text-align: center; padding: 2rem; color: #666;">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                                    <p>Cargando historial de ejercicios...</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="av-empty-state" id="emptyStateRutinas" style="display: none;">
-                        <i class="fas fa-folder-open"></i>
-                        <h3>No hay rutinas creadas</h3>
-                        <p>Crea tu primera rutina usando el formulario de arriba</p>
+                    <div style="margin-top: 1.5rem; text-align: center;">
+                        <button onclick="cargarHistorial()" class="av-btn av-btn-primary" style="padding: 0.75rem 1.5rem;">
+                            <i class="fas fa-sync-alt"></i> Actualizar Historial Rutinas
+                        </button>
                     </div>
                 </div>
             </div>
@@ -217,33 +237,6 @@
         <!-- ==================== TAB: REGISTRAR PROGRESOS ==================== -->
         <div class="av-tab-content" id="progresos">
             <div class="av-dashboard">
-                <!-- Card: Métricas Rápidas -->
-                <div class="av-card">
-                    <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-bolt"></i> Métricas del Día</h3>
-                        <div class="av-card-icon blue"><i class="fas fa-heartbeat"></i></div>
-                    </div>
-                    
-                    <div class="av-metrics-grid" style="margin-bottom: 0;">
-                        <div class="av-metric">
-                            <div class="av-metric-value">4.2</div>
-                            <div class="av-metric-label">km Coridos</div>
-                        </div>
-                        <div class="av-metric">
-                            <div class="av-metric-value">245</div>
-                            <div class="av-metric-label">Kcal Quemadas</div>
-                        </div>
-                        <div class="av-metric">
-                            <div class="av-metric-value">45</div>
-                            <div class="av-metric-label">Min Activo</div>
-                        </div>
-                        <div class="av-metric">
-                            <div class="av-metric-value">7.2</div>
-                            <div class="av-metric-label">Pasos (x1000)</div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Card: Registrar Peso -->
                 <div class="av-card">
                     <div class="av-card-header">
@@ -252,19 +245,21 @@
                     </div>
                     
                     <form id="formPeso">
+                        <input type="hidden" name="form_type" value="peso">
+                        <input type="hidden" name="usuario_id" value="demo_user">
                         <div class="av-form-group">
                             <label class="av-form-label">Peso Actual (kg)</label>
-                            <input type="number" class="av-form-input" id="pesoActual" placeholder="75.5" min="20" max="300" step="0.1" required>
+                            <input type="number" class="av-form-input" name="peso" placeholder="75.5" min="20" max="300" step="0.1" required>
                         </div>
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Fecha de Medición</label>
-                            <input type="date" class="av-form-input" id="fechaPeso" required>
+                            <input type="date" class="av-form-input" name="fecha_medicion" required>
                         </div>
                         
                         <div class="av-form-group">
                             <label class="av-form-label">Notas</label>
-                            <textarea class="av-form-textarea" id="notasPeso" placeholder="Observaciones..."></textarea>
+                            <textarea class="av-form-textarea" name="notas" placeholder="Observaciones..."></textarea>
                         </div>
                         
                         <button type="submit" class="av-btn av-btn-success" style="width: 100%;">
@@ -281,23 +276,38 @@
                     </div>
                     
                     <form id="formMedidas">
+                        <input type="hidden" name="form_type" value="medidas">
+                        <input type="hidden" name="usuario_id" value="demo_user">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                             <div class="av-form-group">
+                                <label class="av-form-label">Fecha de Medición</label>
+                                <input type="date" class="av-form-input" name="fecha_medicion" required>
+                            </div>
+                            <div class="av-form-group">
                                 <label class="av-form-label">Pecho (cm)</label>
-                                <input type="number" class="av-form-input" id="medidaPecho" placeholder="100" step="0.1">
+                                <input type="number" class="av-form-input" name="pecho" placeholder="100" step="0.1">
                             </div>
                             <div class="av-form-group">
                                 <label class="av-form-label">Cintura (cm)</label>
-                                <input type="number" class="av-form-input" id="medidaCintura" placeholder="80" step="0.1">
+                                <input type="number" class="av-form-input" name="cintura" placeholder="80" step="0.1">
                             </div>
                             <div class="av-form-group">
                                 <label class="av-form-label">Cadera (cm)</label>
-                                <input type="number" class="av-form-input" id="medidaCadera" placeholder="95" step="0.1">
+                                <input type="number" class="av-form-input" name="cadera" placeholder="95" step="0.1">
                             </div>
                             <div class="av-form-group">
                                 <label class="av-form-label">Bíceps (cm)</label>
-                                <input type="number" class="av-form-input" id="medidaBiceps" placeholder="35" step="0.1">
+                                <input type="number" class="av-form-input" name="biceps" placeholder="35" step="0.1">
                             </div>
+                            <div class="av-form-group">
+                                <label class="av-form-label">Pierna (cm)</label>
+                                <input type="number" class="av-form-input" name="pierna" placeholder="55" step="0.1">
+                            </div>
+                        </div>
+                        
+                        <div class="av-form-group">
+                            <label class="av-form-label">Notas</label>
+                            <textarea class="av-form-textarea" name="notas" placeholder="Observaciones sobre las medidas..."></textarea>
                         </div>
                         
                         <button type="submit" class="av-btn av-btn-primary" style="width: 100%;">
@@ -306,251 +316,68 @@
                     </form>
                 </div>
 
-                <!-- Card: Entrenamientos Realizados -->
-                <div class="av-card">
-                    <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-check-circle"></i> Registrar Entrenamiento</h3>
-                        <div class="av-card-icon purple"><i class="fas fa-calendar-check"></i></div>
+
+            </div>
+            
+            <!-- Dashboard de Historial de Progresos -->
+            <div class="av-card" style="grid-column: 1 / -1;">
+                <div class="av-card-header">
+                    <h3 class="av-card-title"><i class="fas fa-history"></i> Historial de Progresos</h3>
+                    <div class="av-card-icon orange"><i class="fas fa-chart-line"></i></div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <!-- Columna de Peso -->
+                    <div>
+                        <h4 style="color: #4caf50; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-weight"></i> Registro de Peso
+                        </h4>
+                        <div id="historialPeso" style="max-height: 500px; overflow-y: auto;">
+                            <div style="text-align: center; padding: 2rem; color: #666;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 1rem;"></i>
+                                <p>Cargando historial de peso...</p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <form id="formEntrenamiento">
-                        <div class="av-form-group">
-                            <label class="av-form-label">Rutina Realizada</label>
-                            <select class="av-form-select" id="rutinaRealizada">
-                                <option value="">Selecciona una rutina</option>
-                                <option value="1">Rutina de Piernas - Lunes</option>
-                                <option value="2">Cardio Matutino</option>
-                                <option value="3">Estiramientos y Yoga</option>
-                            </select>
+                    <!-- Columna de Medidas -->
+                    <div>
+                        <h4 style="color: #ff9800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-ruler"></i> Medidas Corporales
+                        </h4>
+                        <div id="historialMedidas" style="max-height: 500px; overflow-y: auto;">
+                            <div style="text-align: center; padding: 2rem; color: #666;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 1rem;"></i>
+                                <p>Cargando historial de medidas...</p>
+                            </div>
                         </div>
-                        
-                        <div class="av-form-group">
-                            <label class="av-form-label">Intensidad</label>
-                            <input type="range" class="av-range" id="intensidadEntreno" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent = this.value">
-                            <output style="text-align: center; font-weight: 600; color: #1976d2; margin-top: 0.5rem;">5</output>
-                        </div>
-                        
-                        <div class="av-form-group">
-                            <label class="av-form-label">¿Cómo te sentiste?</label>
-                            <select class="av-form-select" id="sensacionEntreno">
-                                <option value="">Selecciona...</option>
-                                <option value="excelente">🤩 Excelente</option>
-                                <option value="bien">😊 Bien</option>
-                                <option value="regular">😐 Regular</option>
-                                <option value="cansado">😓 Cansado</option>
-                                <option value="agotado">😫 Agotado</option>
-                            </select>
-                        </div>
-                        
-                        <div class="av-form-group">
-                            <label class="av-form-label">Duración Real (min)</label>
-                            <input type="number" class="av-form-input" id="duracionReal" placeholder="55" min="1">
-                        </div>
-                        
-                        <button type="submit" class="av-btn av-btn-success" style="width: 100%;">
-                            <i class="fas fa-check"></i> Registrar
-                        </button>
-                    </form>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <button onclick="cargarHistorialProgresos()" class="av-btn av-btn-success" style="padding: 0.75rem 1.5rem;">
+                        <i class="fas fa-sync-alt"></i> Actualizar Historial Progresos
+                    </button>
                 </div>
 
-                <!-- Card: Historial de Progresos -->
-                <div class="av-card" style="grid-column: 1 / -1;">
-                    <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-chart-line"></i> Historial de Progresos</h3>
-                        <div class="av-card-icon blue"><i class="fas fa-history"></i></div>
-                    </div>
-                    
-                    <div class="av-progress-chart">
-                        <div class="av-progress-bar" style="height: 65%;" data-label="Lun"></div>
-                        <div class="av-progress-bar" style="height: 80%;" data-label="Mar"></div>
-                        <div class="av-progress-bar" style="height: 45%;" data-label="Mié"></div>
-                        <div class="av-progress-bar" style="height: 90%;" data-label="Jue"></div>
-                        <div class="av-progress-bar" style="height: 70%;" data-label="Vie"></div>
-                        <div class="av-progress-bar" style="height: 55%;" data-label="Sáb"></div>
-                        <div class="av-progress-bar" style="height: 85%;" data-label="Dom"></div>
-                    </div>
-                    
-                    <div class="av-table-container">
-                        <table class="av-table">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Peso (kg)</th>
-                                    <th>Pecho</th>
-                                    <th>Cintura</th>
-                                    <th>Entrenos</th>
-                                    <th>Nota</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>22/03/2026</td>
-                                    <td><strong>75.5</strong> <span class="av-badge av-badge-success">-0.3</span></td>
-                                    <td>100 cm</td>
-                                    <td>82 cm</td>
-                                    <td>1</td>
-                                    <td>😊 Bien</td>
-                                </tr>
-                                <tr>
-                                    <td>20/03/2026</td>
-                                    <td><strong>75.8</strong> <span class="av-badge av-badge-success">-0.2</span></td>
-                                    <td>100.5 cm</td>
-                                    <td>82.5 cm</td>
-                                    <td>2</td>
-                                    <td>🤩 Excelente</td>
-                                </tr>
-                                <tr>
-                                    <td>18/03/2026</td>
-                                    <td><strong>76.0</strong></td>
-                                    <td>101 cm</td>
-                                    <td>83 cm</td>
-                                    <td>1</td>
-                                    <td>😐 Regular</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
 
         <!-- ==================== TAB: ESTADÍSTICAS ==================== -->
         <div class="av-tab-content" id="estadisticas">
             <div class="av-dashboard">
-                <!-- Stats Overview -->
-                <div class="av-card">
-                    <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-trophy"></i> Resumen General</h3>
-                        <div class="av-card-icon orange"><i class="fas fa-star"></i></div>
-                    </div>
-                    
-                    <div class="av-metrics-grid">
-                        <div class="av-metric">
-                            <div class="av-metric-value">23</div>
-                            <div class="av-metric-label">Entrenos Totales</div>
-                        </div>
-                        <div class="av-metric">
-                            <div class="av-metric-value">12</div>
-                            <div class="av-metric-label">Semanas Activo</div>
-                        </div>
-                        <div class="av-metric">
-                            <div class="av-metric-value">4.5</div>
-                            <div class="av-metric-label">kg Perdidos</div>
-                        </div>
-                        <div class="av-metric">
-                            <div class="av-metric-value">85%</div>
-                            <div class="av-metric-label">Cumplimiento</div>
-                        </div>
+                <h3 style="color: #1976d2; margin-bottom: 1.5rem;"><i class="fas fa-chart-pie"></i> Estadísticas</h3>
+                <div id="estadisticasContent">
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando estadísticas...</p>
                     </div>
                 </div>
-
-                <!-- Logros -->
-                <div class="av-card">
-                    <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-medal"></i> Tus Logros</h3>
-                        <div class="av-card-icon green"><i class="fas fa-award"></i></div>
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-radius: 10px;">
-                            <div style="width: 45px; height: 45px; background: #ff9800; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem;">
-                                <i class="fas fa-fire"></i>
-                            </div>
-                            <div>
-                                <div style="font-weight: 700; color: #e65100;">Racha de 7 días</div>
-                                <div style="font-size: 0.85rem; color: #6b7280;">¡Sigue así!</div>
-                            </div>
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px;">
-                            <div style="width: 45px; height: 45px; background: #1976d2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem;">
-                                <i class="fas fa-running"></i>
-                            </div>
-                            <div>
-                                <div style="font-weight: 700; color: #1565c0;">Primer 5K</div>
-                                <div style="font-size: 0.85rem; color: #6b7280;">Completado</div>
-                            </div>
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 10px;">
-                            <div style="width: 45px; height: 45px; background: #43a047; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem;">
-                                <i class="fas fa-dumbbell"></i>
-                            </div>
-                            <div>
-                                <div style="font-weight: 700; color: #2e7d32;">20 Entrenamientos</div>
-                                <div style="font-size: 0.85rem; color: #6b7280;">Meta alcanzada</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Objetivos -->
-                <div class="av-card">
-                    <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-bullseye"></i> Objetivos Activos</h3>
-                        <div class="av-card-icon purple"><i class="fas fa-flag"></i></div>
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="font-weight: 600; color: #1f2937;">Peso objetivo: 70 kg</span>
-                                <span style="color: #1976d2; font-weight: 700;">75%</span>
-                            </div>
-                            <div style="height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden;">
-                                <div style="height: 100%; width: 75%; background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); border-radius: 5px;"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="font-weight: 600; color: #1f2937;">Cintura: 78 cm</span>
-                                <span style="color: #ff9800; font-weight: 700;">45%</span>
-                            </div>
-                            <div style="height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden;">
-                                <div style="height: 100%; width: 45%; background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%); border-radius: 5px;"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span style="font-weight: 600; color: #1f2937;">Entrenos semanales: 4</span>
-                                <span style="color: #1976d2; font-weight: 700;">60%</span>
-                            </div>
-                            <div style="height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden;">
-                                <div style="height: 100%; width: 60%; background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%); border-radius: 5px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rendimiento Semanal -->
-                <div class="av-card" style="grid-column: 1 / -1;">
-                    <div class="av-card-header">
-                        <h3 class="av-card-title"><i class="fas fa-chart-bar"></i> Rendimiento Semanal</h3>
-                        <div class="av-card-icon blue"><i class="fas fa-calendar-week"></i></div>
-                    </div>
-                    
-                    <div class="av-progress-chart" style="height: 200px;">
-                        <div class="av-progress-bar" style="height: 75%; background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%);" data-label="Lun"></div>
-                        <div class="av-progress-bar" style="height: 90%; background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%);" data-label="Mar"></div>
-                        <div class="av-progress-bar" style="height: 40%; background: linear-gradient(180deg, #ff9800 0%, #ffb74d 100%);" data-label="Mié"></div>
-                        <div class="av-progress-bar" style="height: 100%; background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%);" data-label="Jue"></div>
-                        <div class="av-progress-bar" style="height: 80%; background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%);" data-label="Vie"></div>
-                        <div class="av-progress-bar" style="height: 55%; background: linear-gradient(180deg, #ff9800 0%, #ffb74d 100%);" data-label="Sáb"></div>
-                        <div class="av-progress-bar" style="height: 85%; background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%);" data-label="Dom"></div>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <div style="width: 15px; height: 15px; background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%); border-radius: 3px;"></div>
-                            <span style="font-size: 0.9rem; color: #6b7280;">Objetivo alcanzado</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <div style="width: 15px; height: 15px; background: linear-gradient(180deg, #ff9800 0%, #ffb74d 100%); border-radius: 3px;"></div>
-                            <span style="font-size: 0.9rem; color: #6b7280;">Parcial</span>
-                        </div>
-                    </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <button onclick="cargarEstadisticas()" class="av-btn av-btn-primary" style="padding: 0.75rem 1.5rem;">
+                        <i class="fas fa-sync-alt"></i> Actualizar Estadísticas
+                    </button>
                 </div>
             </div>
         </div>
@@ -558,434 +385,543 @@
 
     <!-- Footer -->
     <footer class="main-footer">
-    <div class="footer-content">
-        <div class="footer-section">
-            <h3>DeporteFit</h3>
-            <p>La plataforma líder en entrenamiento deportivo personalizado con certificaciones profesionales.</p>
-            <div class="social-links">
-                <a href="https://www.facebook.com/kevin.zapata.167561" target="_blank" rel="noopener"><i class="fab fa-facebook"></i></a>
-                <a href="https://www.instagram.com/kevinzapata1999/?hl=es" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
-                <a href="https://x.com/KevinZapat42232" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>
-                <a href="https://www.youtube.com/@kevinzapatamoreno608" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>DeporteFit</h3>
+                <p>La plataforma líder en entrenamiento deportivo personalizado con certificaciones profesionales.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/kevin.zapata.167561" target="_blank" rel="noopener"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/kevinzapata1999/?hl=es" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com/KevinZapat42232" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.youtube.com/@kevinzapatamoreno608" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Servicios</h4>
+                <ul>
+                    <li><a href="servicios.html">Entrenamiento Personal</a></li>
+                    <li><a href="servicios.html">Cursos Certificados</a></li>
+                    <li><a href="planes.html">Planes de Nutrición</a></li>
+                    <li><a href="servicios.html">Asesoría Deportiva</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Deportes</h4>
+                <ul>
+                    <li><a href="servicios.html">Running</a></li>
+                    <li><a href="servicios.html">Fitness</a></li>
+                    <li><a href="servicios.html">Natación</a></li>
+                    <li><a href="servicios.html">Ciclismo</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contacto</h4>
+                <p><i class="fas fa-envelope"></i> info@deportefit.com</p>
+                <p><i class="fas fa-phone"></i> (593) 98 765 4321</p>
+                <p><i class="fas fa-map-marker-alt"></i> Calle Deportiva 123, Ciudad Quito</p>
             </div>
         </div>
-        <div class="footer-section">
-            <h4>Servicios</h4>
-            <ul>
-                <li><a href="servicios.html">Entrenamiento Personal</a></li>
-                <li><a href="servicios.html">Cursos Certificados</a></li>
-                <li><a href="planes.html">Planes de Nutrición</a></li>
-                <li><a href="servicios.html">Asesoría Deportiva</a></li>
-            </ul>
+        <div class="footer-bottom">
+            &copy; <?php echo date('Y'); ?> DeporteFit. Todos los derechos reservados.
         </div>
-        <div class="footer-section">
-            <h4>Deportes</h4>
-            <ul>
-                <li><a href="servicios.html">Running</a></li>
-                <li><a href="servicios.html">Fitness</a></li>
-                <li><a href="servicios.html">Natación</a></li>
-                <li><a href="servicios.html">Ciclismo</a></li>
-            </ul>
-        </div>
-        <div class="footer-section">
-            <h4>Contacto</h4>
-            <p><i class="fas fa-envelope"></i> info@deportefit.com</p>
-            <p><i class="fas fa-phone"></i> (593) 98 765 4321</p>
-            <p><i class="fas fa-map-marker-alt"></i> Calle Deportiva 123, Ciudad Quito</p>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        &copy; <?php echo date('Y'); ?> DeporteFit. Todos los derechos reservados.
-    </div>
-</footer>
+    </footer>
 
-    <!-- Scripts -->
     <script>
-        // Usuario actual (en producción vendría de la sesión)
-        const USUARIO_ID = 'demo_user';
-        const API_BASE = 'admin_api';
-        let ejerciciosPendientes = [];
+        // JavaScript simplificado para el módulo de avance
         
-        // Configurar fecha actual en el formulario de peso
-        document.getElementById('fechaPeso').valueAsDate = new Date();
-        
-        // Sistema de tabs
-        const tabs = document.querySelectorAll('.av-tab');
-        const tabContents = document.querySelectorAll('.av-tab-content');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
-                const tabId = tab.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
-                
-                // Cargar datos según el tab
-                if (tabId === 'rutinas') cargarRutinas();
-                if (tabId === 'progresos') cargarProgresos();
-                if (tabId === 'estadisticas') cargarEstadisticas();
-            });
-        });
-        
-        // Función para mostrar notificaciones
-        function showNotification(message, type = 'success') {
-            let toastContainer = document.getElementById('av-toast-container');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.id = 'av-toast-container';
-                toastContainer.style.position = 'fixed';
-                toastContainer.style.top = '1rem';
-                toastContainer.style.right = '1rem';
-                toastContainer.style.zIndex = '9999';
-                toastContainer.style.width = 'min(420px, calc(100vw - 2rem))';
-                toastContainer.style.pointerEvents = 'none';
-                document.body.appendChild(toastContainer);
+        // Funciones globales para actualización de historiales
+        function cargarHistorial() {
+            console.log('🔄 Cargando historial...');
+            
+            const divRutinas = document.getElementById('historialRutinas');
+            const divEjercicios = document.getElementById('historialEjercicios');
+            
+            if (divRutinas) {
+                divRutinas.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de rutinas...</p>
+                    </div>
+                `;
             }
-
-            const notification = document.createElement('div');
-            notification.className = `av-alert av-alert-${type}`;
-            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
-            notification.style.pointerEvents = 'auto';
-            toastContainer.prepend(notification);
-            notification.style.animation = 'slideDown 0.3s ease-out';
-            setTimeout(() => {
-                notification.style.animation = 'fadeIn 0.3s ease-out reverse';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        function limpiarFormularioEjercicio() {
-            document.getElementById('nombreEjercicio').value = '';
-            document.getElementById('seriesEjercicio').value = '';
-            document.getElementById('repeticionesEjercicio').value = '';
-            document.getElementById('pesoEjercicio').value = '';
-            document.getElementById('descansoEjercicio').value = '60';
-        }
-        
-        // ==================== API: RUTINAS ====================
-        
-        // Cargar rutinas desde la base de datos
-        async function cargarRutinas() {
-            try {
-                const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}`);
-                const result = await response.json();
-                const selectRutina = document.getElementById('rutinaEjercicio');
-                if (selectRutina) {
-                    selectRutina.innerHTML = '<option value="">Selecciona una rutina</option>';
-                }
+            
+            if (divEjercicios) {
+                divEjercicios.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de ejercicios...</p>
+                    </div>
+                `;
+            }
+            
+            fetch('Procesamientof/cargar_historial.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'cargar_historial', usuario_id: 'demo_user' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Historial recibido:', data);
                 
-                if (result.success && result.data.length > 0) {
-                    const tbody = document.getElementById('cuerpoTablaRutinas');
-                    tbody.innerHTML = '';
-                    
-                    const tipoLabels = { 'fuerza': '💪 Fuerza', 'cardio': '🏃 Cardio', 'flexibilidad': '🧘 Flexibilidad', 'tecnica': '🎯 Técnica', 'resistencia': '🔥 Resistencia' };
-                    const dificultadLabels = { 'principiante': '🌱 Principiante', 'intermedio': '🌿 Intermedio', 'avanzado': '🌳 Avanzado' };
-                    
-                    result.data.forEach(rutina => {
-                        const fecha = new Date(rutina.fecha_creacion).toLocaleDateString('es-ES');
-                        if (selectRutina) {
-                            const option = document.createElement('option');
-                            option.value = rutina.id;
-                            option.textContent = rutina.nombre;
-                            selectRutina.appendChild(option);
+                if (data.success) {
+                    if (divRutinas && data.rutinas) {
+                        if (data.rutinas.length === 0) {
+                            divRutinas.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-dumbbell" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay rutinas creadas aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divRutinas.innerHTML = data.rutinas.map(rutina => `
+                                <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fafafa;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <h5 style="margin: 0; color: #1976d2; font-size: 1rem;">🏋️ ${rutina.nombre}</h5>
+                                        <span style="background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${rutina.tipo}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                        <span style="color: #666; font-size: 0.85rem;">📊 ${rutina.dificultad}</span>
+                                        <span style="color: #666; font-size: 0.85rem;">⏱️ ${rutina.duracion} min</span>
+                                        <span style="color: #666; font-size: 0.85rem;">📅 ${new Date(rutina.fecha_creacion).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            `).join('');
                         }
-                        tbody.innerHTML += `
-                            <tr>
-                                <td><strong>${rutina.nombre}</strong></td>
-                                <td><span class="av-badge av-badge-info">${tipoLabels[rutina.tipo]}</span></td>
-                                <td><span class="av-badge av-badge-warning">${dificultadLabels[rutina.dificultad]}</span></td>
-                                <td><i class="fas fa-stopwatch"></i> ${rutina.duracion} min</td>
-                                <td>${fecha}</td>
-                                <td>
-                                    <button class="av-btn-icon edit" title="Editar" onclick="editarRutina(${rutina.id})"><i class="fas fa-edit"></i></button>
-                                    <button class="av-btn-icon delete" title="Eliminar" onclick="eliminarRutina(${rutina.id})"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                }
-            } catch (error) {
-                console.error('Error cargando rutinas:', error);
-            }
-        }
-        
-        // Crear nueva rutina
-        document.getElementById('formNuevaRutina').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const data = {
-                nombre: document.getElementById('nombreRutina').value,
-                tipo: document.getElementById('tipoRutina').value,
-                dificultad: document.getElementById('dificultadRutina').value,
-                duracion: parseInt(document.getElementById('duracionRutina').value),
-                notas: document.getElementById('notasRutina').value,
-                ejercicios: ejerciciosPendientes
-            };
-            
-            try {
-                const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('Rutina guardada con exito');
-                    this.reset();
-                    ejerciciosPendientes = [];
-                    cargarRutinas();
-                } else {
-                    showNotification(result.message || 'Error al crear rutina', 'error');
-                }
-            } catch (error) {
-                showNotification('Error de conexión', 'error');
-            }
-        });
-
-        // Agregar ejercicio para guardarlo junto con la rutina
-        document.getElementById('formEjercicio').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const ejercicio = {
-                rutina_id: parseInt(document.getElementById('rutinaEjercicio').value, 10),
-                nombre: document.getElementById('nombreEjercicio').value.trim(),
-                series: parseInt(document.getElementById('seriesEjercicio').value, 10),
-                repeticiones: parseInt(document.getElementById('repeticionesEjercicio').value, 10),
-                peso: document.getElementById('pesoEjercicio').value ? parseFloat(document.getElementById('pesoEjercicio').value) : null,
-                descanso: parseInt(document.getElementById('descansoEjercicio').value, 10)
-            };
-
-            if (!ejercicio.rutina_id || !ejercicio.nombre || !ejercicio.series || !ejercicio.repeticiones) {
-                showNotification('Completa todos los campos obligatorios del ejercicio', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}&accion=agregar_ejercicio`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(ejercicio)
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    limpiarFormularioEjercicio();
-                    showNotification('Ejercicio agregado con exito');
-                    cargarRutinas();
-                } else {
-                    showNotification(result.message || 'Error al agregar ejercicio', 'error');
-                }
-            } catch (error) {
-                showNotification('Error de conexión', 'error');
-            }
-        });
-        
-        // Eliminar rutina
-        async function eliminarRutina(id) {
-            if (!confirm('¿Estás seguro de eliminar esta rutina?')) return;
-            
-            try {
-                const response = await fetch(`${API_BASE}/rutinas.php?usuario_id=${USUARIO_ID}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id })
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('Rutina eliminada');
-                    cargarRutinas();
-                } else {
-                    showNotification('Error al eliminar', 'error');
-                }
-            } catch (error) {
-                showNotification('Error de conexión', 'error');
-            }
-        }
-        
-        function editarRutina(id) {
-            showNotification('Función de edición en desarrollo', 'success');
-        }
-        
-        // ==================== API: PROGRESOS ====================
-        
-        async function cargarProgresos() {
-            // Cargar peso
-            try {
-                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=peso`);
-                const result = await response.json();
-                if (result.success && result.data.length > 0) {
-                    // Actualizar tabla de historial si existe
-                }
-            } catch (error) {
-                console.error('Error cargando progresos:', error);
-            }
-        }
-        
-        // Registrar peso
-        document.getElementById('formPeso').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const data = {
-                peso: parseFloat(document.getElementById('pesoActual').value),
-                fecha: document.getElementById('fechaPeso').value,
-                notas: document.getElementById('notasPeso').value
-            };
-            
-            try {
-                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=peso`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification(`Peso registrado: ${data.peso} kg`);
-                    this.reset();
-                    document.getElementById('fechaPeso').valueAsDate = new Date();
-                    cargarProgresos();
-                } else {
-                    showNotification('Error al registrar peso', 'error');
-                }
-            } catch (error) {
-                showNotification('Error de conexión', 'error');
-            }
-        });
-        
-        // Registrar medidas corporales
-        document.getElementById('formMedidas').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const data = {
-                fecha: new Date().toISOString().split('T')[0],
-                pecho: parseFloat(document.getElementById('medidaPecho').value) || null,
-                cintura: parseFloat(document.getElementById('medidaCintura').value) || null,
-                cadera: parseFloat(document.getElementById('medidaCadera').value) || null,
-                biceps: parseFloat(document.getElementById('medidaBiceps').value) || null
-            };
-            
-            try {
-                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=medidas`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('¡Medidas corporales guardadas!');
-                    this.reset();
-                } else {
-                    showNotification('Error al guardar medidas', 'error');
-                }
-            } catch (error) {
-                showNotification('Error de conexión', 'error');
-            }
-        });
-        
-        // Registrar entrenamiento
-        document.getElementById('formEntrenamiento').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const rutinaSelect = document.getElementById('rutinaRealizada');
-            const rutinaTexto = rutinaSelect.options[rutinaSelect.selectedIndex]?.text || 'Entrenamiento Libre';
-            
-            const data = {
-                rutina_id: rutinaSelect.value || null,
-                nombre_rutina: rutinaTexto,
-                intensidad: parseInt(document.getElementById('intensidadEntreno').value),
-                sensacion: document.getElementById('sensacionEntreno').value,
-                duracion: parseInt(document.getElementById('duracionReal').value) || null,
-                calorias: Math.floor(Math.random() * 300) + 100 // Simulado
-            };
-            
-            try {
-                const response = await fetch(`${API_BASE}/progresos.php?usuario_id=${USUARIO_ID}&tipo=entrenamientos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    showNotification('¡Entrenamiento registrado!');
-                    this.reset();
-                    document.getElementById('intensidadEntreno').value = 5;
-                } else {
-                    showNotification('Error al registrar', 'error');
-                }
-            } catch (error) {
-                showNotification('Error de conexión', 'error');
-            }
-        });
-        
-        // ==================== API: ESTADÍSTICAS ====================
-        
-        async function cargarEstadisticas() {
-            try {
-                const response = await fetch(`${API_BASE}/estadisticas.php?usuario_id=${USUARIO_ID}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const stats = result.data;
+                    }
                     
-                    // Actualizar métricas
-                    const metricas = document.querySelectorAll('.av-card .av-metric-value');
-                    if (metricas[0]) metricas[0].textContent = stats.total_entrenamientos || 0;
-                    if (metricas[1]) metricas[1].textContent = stats.semanas_activo || 0;
-                    if (metricas[2]) metricas[2].textContent = (stats.kg_perdidos || 0).toFixed(1);
-                    if (metricas[3]) metricas[3].textContent = (stats.cumplimiento || 0) + '%';
+                    if (divEjercicios && data.ejercicios) {
+                        if (data.ejercicios.length === 0) {
+                            divEjercicios.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-list" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay ejercicios registrados aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divEjercicios.innerHTML = data.ejercicios.map(ejercicio => `
+                                <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fafafa;">
+                                    <h5 style="margin: 0 0 0.5rem 0; color: #4caf50; font-size: 1rem;">💪 ${ejercicio.nombre}</h5>
+                                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                        <span style="color: #666; font-size: 0.85rem;">🔄 ${ejercicio.series} series</span>
+                                        <span style="color: #666; font-size: 0.85rem;">🔁 ${ejercicio.repeticiones} reps</span>
+                                        ${ejercicio.peso ? `<span style="color: #666; font-size: 0.85rem;">⚖️ ${ejercicio.peso} kg</span>` : ''}
+                                    </div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                } else {
+                    console.error('Error al cargar historial:', data.message);
                 }
-            } catch (error) {
-                console.error('Error cargando estadísticas:', error);
+            })
+            .catch(error => {
+                console.error('Error de conexión:', error);
+                if (divRutinas) divRutinas.innerHTML = '<p style="color: #f44336; text-align: center;">Error de conexión</p>';
+                if (divEjercicios) divEjercicios.innerHTML = '<p style="color: #f44336; text-align: center;">Error de conexión</p>';
+            });
+        }
+        
+        function cargarHistorialProgresos() {
+            console.log('🔄 Cargando historial de progresos...');
+            
+            const divPeso = document.getElementById('historialPeso');
+            const divMedidas = document.getElementById('historialMedidas');
+            
+            if (divPeso) {
+                divPeso.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de peso...</p>
+                    </div>
+                `;
+            }
+            
+            if (divMedidas) {
+                divMedidas.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando historial de medidas...</p>
+                    </div>
+                `;
+            }
+            
+            fetch('Procesamientof/cargar_historial_progresos.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'cargar_historial_progresos', usuario_id: 'demo_user' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Historial de progresos recibido:', data);
+                
+                if (data.success) {
+                    if (divPeso && data.pesos) {
+                        if (data.pesos.length === 0) {
+                            divPeso.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-weight" style="font-size: 1.5rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay registros de peso aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divPeso.innerHTML = data.pesos.map((peso, index) => {
+                                const esMasReciente = index === 0;
+                                const fechaCorrecta = new Date(peso.fecha_medicion + 'T00:00:00');
+                                return `
+                                    <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fafafa; ${esMasReciente ? 'border-left: 4px solid #4caf50;' : ''}">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                            <h5 style="margin: 0; color: #4caf50; font-size: 1rem;">
+                                                ⚖️ ${peso.peso} kg
+                                                ${esMasReciente ? ' 🆕' : ''}
+                                            </h5>
+                                            <span style="color: #999; font-size: 0.8rem;">
+                                                ${fechaCorrecta.toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        ${peso.notas ? `<p style="margin: 0.5rem 0 0 0; color: #666; font-size: 0.9rem; font-style: italic;">${peso.notas}</p>` : ''}
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    }
+                    
+                    if (divMedidas && data.medidas) {
+                        if (data.medidas.length === 0) {
+                            divMedidas.innerHTML = `
+                                <div style="text-align: center; padding: 2rem; color: #999;">
+                                    <i class="fas fa-ruler" style="font-size: 1.5rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                    <p>No hay registros de medidas aún</p>
+                                </div>
+                            `;
+                        } else {
+                            divMedidas.innerHTML = data.medidas.map((medida, index) => {
+                                const esMasReciente = index === 0;
+                                const fechaCorrecta = new Date(medida.fecha_medicion + 'T00:00:00');
+                                return `
+                                    <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fafafa; ${esMasReciente ? 'border-left: 4px solid #ff9800;' : ''}">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                            <h5 style="margin: 0; color: #ff9800; font-size: 1rem;">
+                                                📏 Medidas ${esMasReciente ? ' 🆕' : ''}
+                                            </h5>
+                                            <span style="color: #999; font-size: 0.8rem;">
+                                                ${fechaCorrecta.toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                                            ${medida.pecho ? `<span style="color: #666; font-size: 0.85rem;">🏋️ Pecho: ${medida.pecho} cm</span>` : ''}
+                                            ${medida.cintura ? `<span style="color: #666; font-size: 0.85rem;">📐 Cintura: ${medida.cintura} cm</span>` : ''}
+                                            ${medida.cadera ? `<span style="color: #666; font-size: 0.85rem;">🦵 Cadera: ${medida.cadera} cm</span>` : ''}
+                                            ${medida.biceps ? `<span style="color: #666; font-size: 0.85rem;">💪 Bíceps: ${medida.biceps} cm</span>` : ''}
+                                            ${medida.pierna ? `<span style="color: #666; font-size: 0.85rem;">🦿 Pierna: ${medida.pierna} cm</span>` : ''}
+                                        </div>
+                                        ${medida.notas ? `<p style="margin: 0.5rem 0 0 0; color: #666; font-size: 0.9rem; font-style: italic;">${medida.notas}</p>` : ''}
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+                    }
+                } else {
+                    console.error('Error al cargar historial de progresos:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error de conexión:', error);
+                if (divPeso) divPeso.innerHTML = '<p style="color: #f44336; text-align: center;">Error de conexión</p>';
+                if (divMedidas) divMedidas.innerHTML = '<p style="color: #f44336; text-align: center;">Error de conexión</p>';
+            });
+        }
+        
+        // Función para cargar estadísticas
+        function cargarEstadisticas() {
+            console.log('📊 Cargando estadísticas...');
+            
+            const divEstadisticas = document.getElementById('estadisticasContent');
+            
+            // Contar elementos en los historiales
+            const divRutinas = document.getElementById('historialRutinas');
+            const divEjercicios = document.getElementById('historialEjercicios');
+            const divPeso = document.getElementById('historialPeso');
+            const divMedidas = document.getElementById('historialMedidas');
+            
+            // Contar rutinas (divs con border)
+            const rutinas = divRutinas ? divRutinas.querySelectorAll('div[style*="border"]').length : 0;
+            
+            // Contar ejercicios
+            const ejercicios = divEjercicios ? divEjercicios.querySelectorAll('div[style*="border"]').length : 0;
+            
+            // Contar registros de peso
+            const peso = divPeso ? divPeso.querySelectorAll('div[style*="border"]').length : 0;
+            
+            // Contar registros de medidas
+            const medidas = divMedidas ? divMedidas.querySelectorAll('div[style*="border"]').length : 0;
+            
+            // Total de registros
+            const totalRegistros = rutinas + ejercicios + peso + medidas;
+            
+            if (divEstadisticas) {
+                divEstadisticas.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Card: Rutinas -->
+                        <div style="background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-dumbbell" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <h3 style="margin: 0; font-size: 2rem;">${rutinas}</h3>
+                            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Rutinas</p>
+                        </div>
+                        
+                        <!-- Card: Registros de Peso -->
+                        <div style="background: linear-gradient(135deg, #43a047, #66bb6a); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-weight" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <h3 style="margin: 0; font-size: 2rem;">${peso}</h3>
+                            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Registros de Peso</p>
+                        </div>
+                        
+                        <!-- Card: Registros de Medidas -->
+                        <div style="background: linear-gradient(135deg, #ff9800, #ffb74d); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-ruler" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <h3 style="margin: 0; font-size: 2rem;">${medidas}</h3>
+                            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Registros de Medidas</p>
+                        </div>
+                        
+                        <!-- Card: Ejercicios -->
+                        <div style="background: linear-gradient(135deg, #7b1fa2, #ba68c8); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <i class="fas fa-running" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                            <h3 style="margin: 0; font-size: 2rem;">${ejercicios}</h3>
+                            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Ejercicios</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Resumen -->
+                    <div style="background: #f5f5f5; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h4 style="margin: 0 0 1rem 0; color: #333;"><i class="fas fa-chart-bar"></i> Resumen Total</h4>
+                        <div style="display: flex; justify-content: space-around; align-items: center;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5rem; font-weight: bold; color: #1976d2;">${totalRegistros}</div>
+                                <div style="color: #666;">Total de Registros</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Desglose -->
+                    <div style="background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid #e0e0e0;">
+                        <h4 style="margin: 0 0 1rem 0; color: #333;"><i class="fas fa-list"></i> Desglose</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: #e3f2fd; border-radius: 8px;">
+                                <span>🏋️ Rutinas creadas</span>
+                                <strong>${rutinas}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: #e8f5e9; border-radius: 8px;">
+                                <span>⚖️ Registros de peso</span>
+                                <strong>${peso}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: #fff3e0; border-radius: 8px;">
+                                <span>📏 Registros de medidas</span>
+                                <strong>${medidas}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: #f3e5f5; border-radius: 8px;">
+                                <span>💪 Ejercicios registrados</span>
+                                <strong>${ejercicios}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
         }
         
-        // ==================== INICIALIZACIÓN ====================
-        
-        // Cargar datos iniciales
-        cargarRutinas();
-        
-        // Efectos hover en las barras de progreso
-        document.querySelectorAll('.av-progress-bar').forEach(bar => {
-            bar.addEventListener('mouseenter', function() {
-                this.style.transform = 'scaleY(1.1)';
-                this.style.transformOrigin = 'bottom';
-            });
-            bar.addEventListener('mouseleave', function() {
-                this.style.transform = 'scaleY(1)';
-            });
-        });
-        
-        // Animación de carga de métricas
-        document.querySelectorAll('.av-metric-value').forEach((metric, index) => {
-            const finalValue = metric.textContent;
-            let currentValue = 0;
-            const increment = parseFloat(finalValue) / 20;
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Módulo de avance iniciado');
             
-            const animate = () => {
-                if (currentValue < parseFloat(finalValue)) {
-                    currentValue += increment;
-                    metric.textContent = parseFloat(currentValue).toFixed(1);
-                    requestAnimationFrame(animate);
-                } else {
-                    metric.textContent = finalValue;
-                }
-            };
+            // Sistema de tabs
+            const tabs = document.querySelectorAll('.av-tab');
+            const tabContents = document.querySelectorAll('.av-tab-content');
             
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        setTimeout(animate, index * 100);
-                        observer.unobserve(metric);
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    console.log(`🔄 Cambiando a la pestaña: ${tabId}`);
+                    
+                    // Cargar estadísticas cuando se active la pestaña
+                    if (tabId === 'estadisticas') {
+                        cargarEstadisticas();
                     }
                 });
             });
             
-            observer.observe(metric);
+            // Función global showNotification
+            window.showNotification = function(type, message) {
+                const notification = document.getElementById('notification');
+                const messageEl = document.getElementById('notification-message');
+                
+                if (!notification || !messageEl) {
+                    console.error('❌ Elementos de notificación no encontrados');
+                    alert(message); // Fallback
+                    return;
+                }
+                
+                console.log('🔔 Mostrando notificación de avance:', type, message);
+                messageEl.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 300);
+                }, 5000);
+            };
+            
+            // Manejo de todos los formularios
+            const formRutina = document.getElementById('formNuevaRutina');
+            const formEjercicio = document.getElementById('formEjercicio');
+            const formPeso = document.getElementById('formPeso');
+            const formMedidas = document.getElementById('formMedidas');
+            const formEntrenamiento = document.getElementById('formEntrenamiento');
+            
+            // Función genérica para manejar envío de formularios
+            function handleFormSubmit(form, formType, successMessage, onSuccessCallback) {
+                form.addEventListener('submit', function(e) {
+                    console.log(`📝 Enviando formulario de ${formType}`);
+                    e.preventDefault();
+                    
+                    // Enviar con AJAX
+                    const formData = new FormData(form);
+                    showNotification('success', `🔄 Procesando ${formType}...`);
+                    
+                    fetch('Procesamientof/procesar_formularios.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        console.log(`📥 Respuesta de ${formType}:`, response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(`📋 Datos de ${formType} procesados:`, data);
+                        
+                        if (data.success) {
+                            showNotification('success', data.message || successMessage);
+                            form.reset();
+                            console.log(`✅ ${formType} procesado exitosamente`);
+                            
+                            // Ejecutar callback de éxito si existe
+                            if (onSuccessCallback && typeof onSuccessCallback === 'function') {
+                                setTimeout(onSuccessCallback, 500);
+                            }
+                        } else {
+                            showNotification('error', data.message || `Error al procesar ${formType}`);
+                            console.log(`❌ Error en ${formType}:`, data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`💥 Error en ${formType}:`, error);
+                        showNotification('error', `Error de conexión al procesar ${formType}`);
+                    });
+                });
+            }
+            
+            // Configurar cada formulario
+            if (formRutina) {
+                handleFormSubmit(formRutina, 'rutina', '¡Éxito! Tu rutina ha sido creada.', function() {
+                    cargarHistorial(); // Actualizar historial
+                    cargarRutinasDisponibles(); // Actualizar selects de rutinas
+                });
+            }
+            
+            if (formEjercicio) {
+                handleFormSubmit(formEjercicio, 'ejercicio', '¡Éxito! El ejercicio ha sido agregado a tu rutina.', cargarHistorial);
+            }
+            
+            if (formPeso) {
+                handleFormSubmit(formPeso, 'peso', '¡Éxito! Tu peso ha sido registrado.', cargarHistorialProgresos);
+            }
+            
+            if (formMedidas) {
+                handleFormSubmit(formMedidas, 'medidas', '¡Éxito! Tus medidas corporales han sido registradas.', cargarHistorialProgresos);
+            }
+            
+            if (formEntrenamiento) {
+                handleFormSubmit(formEntrenamiento, 'entrenamiento', '¡Éxito! Tu entrenamiento ha sido registrado.', cargarHistorialProgresos);
+            }
+            
+            // Función para cargar rutinas disponibles en el select de ejercicios
+            function cargarRutinasDisponibles() {
+                console.log('🔄 Cargando rutinas disponibles...');
+                
+                fetch('Procesamientof/cargar_rutinas.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'cargar_rutinas', usuario_id: 'demo_user' })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📋 Respuesta de rutinas:', data);
+                    
+                    if (data.success && data.rutinas) {
+                        // Actualizar select de ejercicios
+                        const selectEjercicio = document.querySelector('select[name="rutina_id"]');
+                        if (selectEjercicio) {
+                            selectEjercicio.innerHTML = '<option value="">Selecciona una rutina</option>';
+                            data.rutinas.forEach(rutina => {
+                                const option = document.createElement('option');
+                                option.value = rutina.id;
+                                option.textContent = rutina.nombre;
+                                selectEjercicio.appendChild(option);
+                            });
+                            console.log(`✅ ${data.rutinas.length} rutinas cargadas para ejercicios`);
+                        }
+                        
+                        // Actualizar select de entrenamientos realizados
+                        const selectEntrenamiento = document.querySelector('form#formEntrenamiento select[name="rutina_id"]');
+                        if (selectEntrenamiento) {
+                            selectEntrenamiento.innerHTML = '<option value="">Selecciona una rutina</option>';
+                            data.rutinas.forEach(rutina => {
+                                const option = document.createElement('option');
+                                option.value = rutina.id;
+                                option.textContent = rutina.nombre;
+                                selectEntrenamiento.appendChild(option);
+                            });
+                            console.log(`✅ ${data.rutinas.length} rutinas cargadas para entrenamientos`);
+                        }
+                    } else {
+                        console.log('❌ Error al cargar rutinas:', data.message || 'Error desconocido');
+                    }
+                })
+                .catch(error => {
+                    console.error('💥 Error en la petición de rutinas:', error);
+                });
+            }
+            
+            // Cargar rutinas disponibles al iniciar
+            cargarRutinasDisponibles();
+            
+            // Establecer fecha actual en los formularios de progresos
+            const fechaActual = new Date().toISOString().split('T')[0];
+            const inputFechaPeso = document.querySelector('#formPeso input[name="fecha_medicion"]');
+            const inputFechaMedidas = document.querySelector('#formMedidas input[name="fecha_medicion"]');
+            
+            if (inputFechaPeso) {
+                inputFechaPeso.value = fechaActual;
+            }
+            if (inputFechaMedidas) {
+                inputFechaMedidas.value = fechaActual;
+            }
+            
+
+            
+
+            
+
+            
+            // Cargar historiales automáticamente al iniciar
+            setTimeout(cargarHistorial, 1000);
+            setTimeout(cargarHistorialProgresos, 1500);
+            setTimeout(cargarEstadisticas, 2000);
+            
+            console.log('🎯 Módulo de avance completamente cargado');
         });
     </script>
 </body>
