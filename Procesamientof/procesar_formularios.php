@@ -2,6 +2,12 @@
 // Archivo para procesar formularios según la página de origen
 include __DIR__ . '/../conexion.php';
 
+// Función para obtener fecha/hora de Ecuador (corregir desfase en InfinityFree)
+function obtenerFechaHoraEcuador() {
+    date_default_timezone_set('America/Guayaquil');
+    return date('Y-m-d H:i:s');
+}
+
 // Verificar que la conexión esté activa
 if (!$conexion) {
     die("Error: No se pudo conectar a la base de datos");
@@ -99,14 +105,15 @@ function procesarFormularioContacto($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla contactos
-    $sql = "INSERT INTO contactos (nombre, email, telefono, motivo, mensaje, privacidad, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO contactos (nombre, email, telefono, motivo, mensaje, privacidad, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sssssi", $nombre, $email, $telefono, $motivo, $mensaje, $privacidad);
+        mysqli_stmt_bind_param($stmt, "sssssis", $nombre, $email, $telefono, $motivo, $mensaje, $privacidad, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -155,14 +162,15 @@ function procesarFormularioEntrenadores($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla solicitudes_entrenadores
-    $sql = "INSERT INTO solicitudes_entrenadores (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO solicitudes_entrenadores (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sssss", $nombre, $email, $telefono, $motivo, $mensaje);
+        mysqli_stmt_bind_param($stmt, "ssssss", $nombre, $email, $telefono, $motivo, $mensaje, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -211,14 +219,15 @@ function procesarFormularioPlanes($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla solicitudes_planes
-    $sql = "INSERT INTO solicitudes_planes (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO solicitudes_planes (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sssss", $nombre, $email, $telefono, $motivo, $mensaje);
+        mysqli_stmt_bind_param($stmt, "ssssss", $nombre, $email, $telefono, $motivo, $mensaje, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -267,14 +276,15 @@ function procesarFormularioServicios($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla solicitudes_servicios
-    $sql = "INSERT INTO solicitudes_servicios (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO solicitudes_servicios (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sssss", $nombre, $email, $telefono, $motivo, $mensaje);
+        mysqli_stmt_bind_param($stmt, "ssssss", $nombre, $email, $telefono, $motivo, $mensaje, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -321,14 +331,15 @@ function procesarFormularioGeneral($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla contactos (tabla general)
-    $sql = "INSERT INTO contactos (nombre, email, telefono, motivo, mensaje, privacidad, fecha_creacion) VALUES (?, ?, ?, ?, ?, 0, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO contactos (nombre, email, telefono, motivo, mensaje, privacidad, fecha_creacion) VALUES (?, ?, ?, ?, ?, 0, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sssss", $nombre, $email, $telefono, $motivo, $mensaje);
+        mysqli_stmt_bind_param($stmt, "ssssss", $nombre, $email, $telefono, $motivo, $mensaje, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -368,14 +379,15 @@ function procesarFormularioRutina($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla rutinas
-    $sql = "INSERT INTO rutinas (usuario_id, nombre, tipo, dificultad, duracion, notas, fecha_creacion, estado) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'activa')";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO rutinas (usuario_id, nombre, tipo, dificultad, duracion, notas, fecha_creacion, estado) VALUES (?, ?, ?, ?, ?, ?, ?, 'activa')";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "ssssis", $usuario_id, $nombre, $tipo, $dificultad, $duracion, $notas);
+        mysqli_stmt_bind_param($stmt, "ssssiss", $usuario_id, $nombre, $tipo, $dificultad, $duracion, $notas, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -419,14 +431,15 @@ function procesarFormularioEjercicio($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla ejercicios
-    $sql = "INSERT INTO ejercicios (rutina_id, nombre, series, repeticiones, peso, descanso, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO ejercicios (rutina_id, nombre, series, repeticiones, peso, descanso, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "isiiid", $rutina_id, $nombre, $series, $repeticiones, $peso, $descanso);
+        mysqli_stmt_bind_param($stmt, "isiiids", $rutina_id, $nombre, $series, $repeticiones, $peso, $descanso, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -468,14 +481,15 @@ function procesarFormularioPeso($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla progreses_peso
-    $sql = "INSERT INTO progresos_peso (usuario_id, peso, fecha_medicion, notas, fecha_creacion) VALUES (?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO progresos_peso (usuario_id, peso, fecha_medicion, notas, fecha_creacion) VALUES (?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sdss", $usuario_id, $peso, $fecha_medicion, $notas);
+        mysqli_stmt_bind_param($stmt, "sdsss", $usuario_id, $peso, $fecha_medicion, $notas, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -521,14 +535,15 @@ function procesarFormularioMedidas($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla medidas_corporales
-    $sql = "INSERT INTO medidas_corporales (usuario_id, fecha_medicion, pecho, cintura, cadera, biceps, pierna, notas, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO medidas_corporales (usuario_id, fecha_medicion, pecho, cintura, cadera, biceps, pierna, notas, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sdddddss", $usuario_id, $fecha_medicion, $pecho, $cintura, $cadera, $biceps, $pierna, $notas);
+        mysqli_stmt_bind_param($stmt, "sddddddss", $usuario_id, $fecha_medicion, $pecho, $cintura, $cadera, $biceps, $pierna, $notas, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {
@@ -579,14 +594,15 @@ function procesarFormularioEntrenamiento($conexion) {
     }
 
     // Consulta SQL para insertar en la tabla entrenamientos_realizados
-    $sql = "INSERT INTO entrenamientos_realizados (usuario_id, rutina_id, nombre_rutina, intensidad, sensacion, duracion_real, calorias, fecha_entrenamiento) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO entrenamientos_realizados (usuario_id, rutina_id, nombre_rutina, intensidad, sensacion, duracion_real, calorias, fecha_entrenamiento) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
     
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sisisiii", $usuario_id, $rutina_id, $nombre_rutina, $intensidad, $sensacion, $duracion_real, $calorias);
+        mysqli_stmt_bind_param($stmt, "sisisiis", $usuario_id, $rutina_id, $nombre_rutina, $intensidad, $sensacion, $duracion_real, $calorias, $fechaHora);
         
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {

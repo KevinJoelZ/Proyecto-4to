@@ -2,6 +2,12 @@
 // Procesador dedicado para el formulario de planes
 include '../conexión.php';
 
+// Función para obtener fecha/hora de Ecuador (corregir desfase en InfinityFree)
+function obtenerFechaHoraEcuador() {
+    date_default_timezone_set('America/Guayaquil');
+    return date('Y-m-d H:i:s');
+}
+
 // Verificar que la conexión esté activa
 if (!$conexion) {
     header("Location: ../planes.html?error=1");
@@ -29,14 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Consulta SQL para insertar en la tabla solicitudes_planes (nombre correcto sin espacios)
-    $sql = "INSERT INTO solicitudes_planes (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, NOW())";
+    $fechaHora = obtenerFechaHoraEcuador();
+    $sql = "INSERT INTO solicitudes_planes (nombre, email, telefono, motivo, mensaje, fecha_solicitud) VALUES (?, ?, ?, ?, ?, ?)";
 
     // Preparar la consulta
     $stmt = mysqli_prepare($conexion, $sql);
 
     if ($stmt) {
         // Vincular parámetros
-        mysqli_stmt_bind_param($stmt, "sssss", $nombre, $email, $telefono, $motivo, $mensaje);
+        mysqli_stmt_bind_param($stmt, "ssssss", $nombre, $email, $telefono, $motivo, $mensaje, $fechaHora);
 
         // Ejecutar la consulta
         if (mysqli_stmt_execute($stmt)) {

@@ -4,6 +4,12 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
+// Función para obtener fecha/hora de Ecuador (corregir desfase en InfinityFree)
+function obtenerFechaHoraEcuador() {
+    date_default_timezone_set('America/Guayaquil');
+    return date('Y-m-d H:i:s');
+}
+
 // Habilitar mostrar errores para debug
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -81,13 +87,14 @@ try {
         
         // Mantener admin existente o escalar a admin si el email está en la whitelist
         $rolToUpdate = ($existingUser['rol'] === 'admin' || $isAdminEmail) ? 'admin' : 'cliente';
+        $fechaHora = obtenerFechaHoraEcuador();
 
         $updateSql = "UPDATE usuarios SET
                       nombre = ?,
                       email = ?,
                       foto_perfil = ?,
                       email_verificado = ?,
-                      ultima_conexion = NOW(),
+                      ultima_conexion = ?,
                       rol = ?
                       WHERE uid = ?";
        
@@ -96,7 +103,7 @@ try {
             throw new Exception('Error al preparar consulta de actualización: ' . $conexion->error);
         }
         
-        $updateStmt->bind_param('sssiss', $name, $email, $photoURL, $emailVerified, $rolToUpdate, $uid);
+        $updateStmt->bind_param('sssisss', $name, $email, $photoURL, $emailVerified, $fechaHora, $rolToUpdate, $uid);
        
         if ($updateStmt->execute()) {   
             error_log("Usuario actualizado exitosamente");
@@ -113,15 +120,16 @@ try {
     } else {
         // Usuario nuevo, insertar
         error_log("Usuario nuevo, insertando...");
+        $fechaHora = obtenerFechaHoraEcuador();
         $insertSql = "INSERT INTO usuarios (uid, nombre, email, foto_perfil, email_verificado, fecha_registro, ultima_conexion, rol)
-                      VALUES (?, ?, ?, ?, ?, NOW(), NOW(), ?)";
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         $insertStmt = $conexion->prepare($insertSql);
         if (!$insertStmt) {
             throw new Exception('Error al preparar consulta de inserción: ' . $conexion->error);
         }
         
-        $insertStmt->bind_param('ssssis', $uid, $name, $email, $photoURL, $emailVerified, $rol);
+        $insertStmt->bind_param('ssssssss', $uid, $name, $email, $photoURL, $emailVerified, $fechaHora, $fechaHora, $rol);
        
         if ($insertStmt->execute()) {
             $newUserId = $conexion->insert_id;

@@ -11,10 +11,10 @@ class Database {
     private $connection;
     
     // Configuración de la base de datos
-    private $host = 'localhost';
-    private $username = 'root';
-    private $password = '';
-    private $database = 'plataforma_fitness';
+    private $host = 'sql107.infinityfree.com';
+    private $username = 'if0_39340780';
+    private $password = 'Vd30M31z3a';
+    private $database = 'if0_39340780_base_datos';
     
     /**
      * Constructor - Establece la conexión a la base de datos

@@ -2,6 +2,12 @@
 header('Content-Type: application/json');
 session_start();
 
+// Función para obtener fecha/hora de Ecuador (corregir desfase en InfinityFree)
+function obtenerFechaHoraEcuador() {
+    date_default_timezone_set('America/Guayaquil');
+    return date('Y-m-d H:i:s');
+}
+
 // Incluir conexión a la base de datos (usar el mismo archivo que el resto del proyecto)
 $conexionIncluded = false;
 try {
@@ -46,17 +52,18 @@ if ($action === 'save_choice') {
         plan VARCHAR(100) NOT NULL,
         price VARCHAR(50) NULL,
         user_email VARCHAR(255) NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
     @$conexion->query($createSql);
 
-    // Insertar selección
-    $stmt = $conexion->prepare("INSERT INTO planes_seleccionados (plan, price, user_email) VALUES (?, ?, ?)");
+    // Insertar selección con hora de Ecuador
+    $fechaHora = obtenerFechaHoraEcuador();
+    $stmt = $conexion->prepare("INSERT INTO planes_seleccionados (plan, price, user_email, created_at) VALUES (?, ?, ?, ?)");
     if (!$stmt) {
         echo json_encode(['success' => false, 'message' => 'Error de preparación']);
         exit;
     }
-    $stmt->bind_param('sss', $plan, $price, $user_email);
+    $stmt->bind_param('ssss', $plan, $price, $user_email, $fechaHora);
     $ok = $stmt->execute();
     $stmt->close();
 

@@ -4,6 +4,12 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+// Función para obtener fecha/hora de Ecuador (corregir desfase en InfinityFree)
+function obtenerFechaHoraEcuador() {
+    date_default_timezone_set('America/Guayaquil');
+    return date('Y-m-d H:i:s');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
@@ -17,8 +23,8 @@ $conexion->query("CREATE TABLE IF NOT EXISTS faqs (
     pregunta VARCHAR(255) NOT NULL,
     respuesta TEXT NOT NULL,
     page_slug VARCHAR(64) NOT NULL DEFAULT 'cliente',
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    creado_en DATETIME NULL,
+    actualizado_en DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
 // Asegurar columna page_slug si la tabla existía sin ella
@@ -73,8 +79,9 @@ try {
             $respuesta = trim($input['respuesta'] ?? '');
             $page_slug = sanitize_page($input['page'] ?? 'cliente');
             if ($pregunta === '' || $respuesta === '') throw new Exception('Pregunta y respuesta son requeridas');
-            $stmt = $conexion->prepare("INSERT INTO faqs (pregunta, respuesta, page_slug) VALUES (?, ?, ?)");
-            $stmt->bind_param('sss', $pregunta, $respuesta, $page_slug);
+            $fechaHora = obtenerFechaHoraEcuador();
+            $stmt = $conexion->prepare("INSERT INTO faqs (pregunta, respuesta, page_slug, creado_en, actualizado_en) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param('sssss', $pregunta, $respuesta, $page_slug, $fechaHora, $fechaHora);
             $stmt->execute();
             echo json_encode(['success' => true, 'id' => $stmt->insert_id]);
             break;
@@ -84,8 +91,9 @@ try {
             $respuesta = trim($input['respuesta'] ?? '');
             $page_slug = sanitize_page($input['page'] ?? 'cliente');
             if ($id <= 0 || $pregunta === '' || $respuesta === '') throw new Exception('Datos inválidos');
-            $stmt = $conexion->prepare("UPDATE faqs SET pregunta = ?, respuesta = ?, page_slug = ? WHERE id = ?");
-            $stmt->bind_param('sssi', $pregunta, $respuesta, $page_slug, $id);
+            $fechaHora = obtenerFechaHoraEcuador();
+            $stmt = $conexion->prepare("UPDATE faqs SET pregunta = ?, respuesta = ?, page_slug = ?, actualizado_en = ? WHERE id = ?");
+            $stmt->bind_param('ssssi', $pregunta, $respuesta, $page_slug, $fechaHora, $id);
             $stmt->execute();
             echo json_encode(['success' => true]);
             break;

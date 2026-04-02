@@ -4,6 +4,12 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
+// Función para obtener fecha/hora de Ecuador (corregir desfase en InfinityFree)
+function obtenerFechaHoraEcuador() {
+    date_default_timezone_set('America/Guayaquil');
+    return date('Y-m-d H:i:s');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
@@ -16,7 +22,7 @@ $conexion->query("CREATE TABLE IF NOT EXISTS site_stats (
   id INT AUTO_INCREMENT PRIMARY KEY,
   stat_key VARCHAR(64) UNIQUE,
   stat_value VARCHAR(255) NOT NULL,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at DATETIME NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
 // Pre-cargar claves por defecto si están ausentes
@@ -27,9 +33,10 @@ $defaults = [
   'alumnos_activos' => '250+',
   'soporte' => '24/7'
 ];
+$fechaHora = obtenerFechaHoraEcuador();
 foreach ($defaults as $k => $v) {
-  $stmt = $conexion->prepare("INSERT IGNORE INTO site_stats (stat_key, stat_value) VALUES (?, ?)");
-  $stmt->bind_param('ss', $k, $v);
+  $stmt = $conexion->prepare("INSERT IGNORE INTO site_stats (stat_key, stat_value, updated_at) VALUES (?, ?, ?)");
+  $stmt->bind_param('sss', $k, $v, $fechaHora);
   $stmt->execute();
 }
 
@@ -46,11 +53,12 @@ try {
   } elseif ($action === 'set') {
     $stats = $input['stats'] ?? [];
     if (!is_array($stats)) throw new Exception('Formato inválido');
-    $stmt = $conexion->prepare("INSERT INTO site_stats (stat_key, stat_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE stat_value = VALUES(stat_value)");
+    $fechaHora = obtenerFechaHoraEcuador();
+    $stmt = $conexion->prepare("INSERT INTO site_stats (stat_key, stat_value, updated_at) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE stat_value = VALUES(stat_value), updated_at = VALUES(updated_at)");
     foreach ($stats as $k => $v) {
       $key = substr(trim($k), 0, 64);
       $val = substr(trim((string)$v), 0, 255);
-      $stmt->bind_param('ss', $key, $val);
+      $stmt->bind_param('sss', $key, $val, $fechaHora);
       $stmt->execute();
     }
     echo json_encode(['success' => true]);
