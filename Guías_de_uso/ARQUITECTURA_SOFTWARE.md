@@ -339,6 +339,12 @@ Para más información sobre funcionalidades específicas, consulta:
 - [Guía de Tablas y Formularios](./GUIA_TABLAS_FORMULARIOS.md)
 - [Instrucciones de Formularios](./INSTRUCCIONES_FORMULARIOS.md)
 
+## 9. Conclusiones
+
+1. La arquitectura del proyecto se integró con las APIs y los modelos POO para que las páginas de cliente y avance interactúen con la base de datos de forma consistente y modular.
+
+2. El uso de controladores REST y clases de datos permitió que las funciones de la plataforma se conectaran mejor, reduciendo duplicación y facilitando el mantenimiento.
+
 ---
 
 **Versión**: 1.0  

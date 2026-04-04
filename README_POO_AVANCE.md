@@ -167,6 +167,12 @@ También existe herencia POO:
 - La parte visual y JS de `avance.php` (formularios, fetch, notificaciones) está en estilo procedural/funcional del lado cliente.
 - Los archivos API (`rutinas.php`, `progresos.php`) actúan como controladores HTTP y enrutan peticiones hacia los objetos POO.
 
+## Conclusiones POO
+
+1. La implementación POO en `avance.php` permitió centralizar la lógica de rutinas y progresos en modelos claros, mejorando la organización del proyecto y facilitando cambios futuros.
+
+2. Al usar `Database`, `ModeloBase` y las clases de dominio, el proyecto logró una estructura más ordenada y una interacción consistente entre frontend, API y base de datos.
+
 ---
 
 Documento generado para el módulo **Avance** con enfoque en arquitectura **POO** y persistencia en `guardarbd` (XAMPP local).
