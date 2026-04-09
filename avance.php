@@ -637,29 +637,43 @@
             
             const divEstadisticas = document.getElementById('estadisticasContent');
             
-            // Contar elementos en los historiales
-            const divRutinas = document.getElementById('historialRutinas');
-            const divEjercicios = document.getElementById('historialEjercicios');
-            const divPeso = document.getElementById('historialPeso');
-            const divMedidas = document.getElementById('historialMedidas');
-            
-            // Contar rutinas (divs con border)
-            const rutinas = divRutinas ? divRutinas.querySelectorAll('div[style*="border"]').length : 0;
-            
-            // Contar ejercicios
-            const ejercicios = divEjercicios ? divEjercicios.querySelectorAll('div[style*="border"]').length : 0;
-            
-            // Contar registros de peso
-            const peso = divPeso ? divPeso.querySelectorAll('div[style*="border"]').length : 0;
-            
-            // Contar registros de medidas
-            const medidas = divMedidas ? divMedidas.querySelectorAll('div[style*="border"]').length : 0;
-            
-            // Total de registros
-            const totalRegistros = rutinas + ejercicios + peso + medidas;
-            
+            // Mostrar loading
             if (divEstadisticas) {
                 divEstadisticas.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #666;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; margin-bottom: 1rem;"></i>
+                        <p>Cargando estadísticas...</p>
+                    </div>
+                `;
+            }
+            
+            // Cargar datos frescos desde el servidor
+            Promise.all([
+                fetch('Procesamientof/cargar_historial.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'cargar_historial', usuario_id: 'demo_user' })
+                }).then(r => r.json()),
+                fetch('Procesamientof/cargar_historial_progresos.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'cargar_historial_progresos', usuario_id: 'demo_user' })
+                }).then(r => r.json())
+            ])
+            .then(([dataRutinas, dataProgresos]) => {
+                console.log('📊 Datos recibidos:', { rutinas: dataRutinas, progresos: dataProgresos });
+                
+                // Contar elementos
+                const rutinas = dataRutinas.success && dataRutinas.rutinas ? dataRutinas.rutinas.length : 0;
+                const ejercicios = dataRutinas.success && dataRutinas.ejercicios ? dataRutinas.ejercicios.length : 0;
+                const peso = dataProgresos.success && dataProgresos.pesos ? dataProgresos.pesos.length : 0;
+                const medidas = dataProgresos.success && dataProgresos.medidas ? dataProgresos.medidas.length : 0;
+                
+                // Total de registros
+                const totalRegistros = rutinas + ejercicios + peso + medidas;
+                
+                if (divEstadisticas) {
+                    divEstadisticas.innerHTML = `
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                         <!-- Card: Rutinas -->
                         <div style="background: linear-gradient(135deg, #1976d2, #42a5f5); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
@@ -725,6 +739,18 @@
                     </div>
                 `;
             }
+        })
+        .catch(error => {
+            console.error('Error de conexión:', error);
+            if (divEstadisticas) {
+                divEstadisticas.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #f44336;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Error al cargar estadísticas</p>
+                    </div>
+                `;
+            }
+        });
         }
         
         document.addEventListener('DOMContentLoaded', function() {
